@@ -1,82 +1,62 @@
-use std::collections::HashSet;
-use std::fs;
 use std::time;
+use std::error;
+use std::result;
 use std::fs::File;
 use std::path::Path;
 use itertools::Itertools;
-use json::{object,JsonValue};
-use std::collections::HashMap;
-use std::io::{self,BufRead, Read};
+use std::io::{self, BufRead};
 
-fn main() -> io::Result<()> {
-    let t0 = time::Instant::now();
-    let word_list_path = "word_list.txt";
-    let word_struct_path = "word_struct.json";
-
-    let letters = [
-        ['P', 'N', 'B'],
-        ['K', 'T', 'M'],
-        ['A', 'R', 'I'],
-        ['O', 'U', 'C']];
-    let mut letters_flat: Vec<char> = Vec::new();
-    for set in letters{
-        for letter in set{
-            letters_flat.push(letter);
+pub fn get_valid_words(words: &Vec<String>, permutations: &Vec<String>, letters_flat: &Vec<char>) -> io::Result<Vec<String>> {
+    let invalid_perms: Vec<u16> = permutations
+        .iter()
+        .map(|perm| {
+            perm
+            .as_bytes()
+            .windows(2)
+            .map(|p| {
+                // apply modulus 32 on each element of the slice and collect into a 16 bit integer
+                let mut hash = 0;
+                for &byte in p {
+                    hash = (hash << 5) + (byte as u16 % 32);
+                }
+                hash
+            })
+            .fold(0, |acc, hash| acc + hash)
+        })
+        .collect();
+        
+    let mut valid_words_idx = Vec::new();
+    let mut invalid = false;
+    for (widx, word) in words.into_iter().enumerate() {
+        let mut idx = 0;
+        while let Some(slice) = word.as_bytes().get(idx..idx + 2) {
+            // if the slice contains the same letter twice, break and continue to next word
+            if slice[0] == slice[1] {
+                invalid = true;
+                break;
+            }
+            // apply modulus 32 on each element of the slice and collect into a 16 bit integer
+            let mut hash = 0;
+            for &byte in slice {
+                hash = (hash << 5) + (byte as u16 % 32);
+            }
+            if invalid_perms.contains(&hash) {
+                // break and continue to next word
+                invalid = true;
+                break;
+            }
+            idx += 1;
+        }
+        match invalid {
+            true => invalid = false,
+            false => valid_words_idx.push(widx),
         }
     }
-    let permutations = get_permutations(&letters)?;
-    println!("{:?}", permutations);
 
-    let hashmap = match File::open(word_struct_path) {
-        Ok(mut file) => {
-            // If the file exists, you can proceed with your operations on the file
-            println!("File opened successfully.");
-            let mut contents = String::new();
-            file.read_to_string(&mut contents)?;
-            // Parse the JSON content
-            let json = json::parse(&contents).unwrap_or_else(|_| json::JsonValue::new_object());
-
-            // Convert the JSON to a HashMap
-            let mut hashmap = HashMap::new();
-            if let JsonValue::Object(obj) = json {
-                for (key, value) in obj.iter() {
-                    if let JsonValue::Array(arr) = value {
-                        let strings: HashSet<String> = arr
-                            .iter()
-                            .filter_map(|val| val.as_str())
-                            .map(String::from)
-                            .collect();
-                        if strings.is_disjoint(&permutations){ hashmap.insert(key.to_string(), strings);}
-                        
-                    }       
-                }
-            }
-            hashmap
-        },
-        Err(e) => {
-            if e.kind() == io::ErrorKind::NotFound {
-                // If the file does not exist, call the function to create it
-                let file = create_file(word_struct_path, word_list_path)?;
-                println!("File created successfully.");
-                file
-            } else {
-                // Handle other kinds of errors
-                return Err(e);
-            }
-        }
-    };
-    
-    
-    println!("{:?}", hashmap.get("PROMOTION".into()));
-
-    let mut filtered_words: Vec<String> = hashmap
+    // filter for valid words
+    let valid_words: Vec<String> = valid_words_idx
         .iter()
-        .filter(|&(_, values)| {
-            !values
-            .iter()
-            .any(|value| permutations.contains(value))
-        })
-        .map(|(key, _)| key)
+        .map(|&idx| &words[idx])
         .filter(|word| {
             word
             .chars()
@@ -84,26 +64,46 @@ fn main() -> io::Result<()> {
         })
         .cloned()
         .collect();
-    filtered_words.sort();
 
+    // return valid words
+    Ok(valid_words)
+}
 
-    // //println!("{:?}", filtered_words);
-    // //println!("{:?}", filtered_words.len());
-    // let mut test_var:Vec<String>= hashmap.iter()
-    // .filter(|&(_, values)| {
-    //     !values.iter().any(|value| permutations.contains(value))
-    // })
-    // .map(|(key, _)| key)
-    // .collect();
-    // test_var.sort();
-    // println!("{:?}", test_var);
+pub fn flatten(letters: &[[char; 3]; 4]) -> Vec<char> {
+    let mut letters_flat: Vec<char> = Vec::new();
+    for side in letters {
+        for letter in side {
+            letters_flat.push(*letter);
+        }
+    }
+    letters_flat
+}
 
+fn main() -> result::Result<(), Box<dyn error::Error>> {
+    // start time
+    let t0 = time::Instant::now();
 
+    // file paths
+    let word_list_path = "word_list.txt";
+
+    // input letters
+    let letters = [
+        ['S', 'Y', 'C'],
+        ['B', 'R', 'N'],
+        ['L', 'A', 'T'],
+        ['I', 'H', 'V']];
+    let letters_flat: Vec<char> = flatten(&letters);
+    let permutations = get_permutations(&letters)?;
+
+    // load words from file
+    let words = read_words_from_file(word_list_path)?;
+
+    // filter words
+    let valid_words = get_valid_words(&words, &permutations, &letters_flat)?;
 
     let mut list: Vec<(String,String)> = Vec::new();
-
-    for word1 in &filtered_words {
-        for word2 in &filtered_words {
+    for word1 in &valid_words {
+        for word2 in &valid_words {
             if word1 == word2 { continue }
             // Check if the last character of word1 matches the first character of word2
             if word1.ends_with(&word2[0..1]) {
@@ -111,7 +111,7 @@ fn main() -> io::Result<()> {
                 if letters_flat.iter().all(|&c| concatenated.contains(c)){
                     list.push((word1.clone(), word2.clone()));
                 }
-                // else{
+                // else {
                 //     for word3 in &filtered_words {
                 //         // Check if the last character of word2 matches the first character of word3
                 //         if word2.ends_with(&word3[0..1]) {
@@ -125,12 +125,13 @@ fn main() -> io::Result<()> {
             }
         }
     }
-    let elapsed = time::Instant::now() - t0;
 
-    for item in &list { println!("{}, {}", item.0, item.1);}
-    println!("{:?}", list.len());
-    println!("{:?}", elapsed.as_secs_f32());
-    
+    // print results
+    let elapsed = time::Instant::now() - t0;
+    println!("{:?}", list);
+    println!("{:?} results", list.len());
+    println!("{:?} seconds", elapsed.as_secs_f32());
+
     Ok(())
 }
 
@@ -138,77 +139,25 @@ fn main() -> io::Result<()> {
 fn read_words_from_file<P: AsRef<Path>>(path: P) -> io::Result<Vec<String>> {
     let file = File::open(path)?;
     let reader = io::BufReader::new(file);
-    
     // Collect words into a vector
     let words = reader
         .lines()
         .filter_map(Result::ok)
-        // .filter(|word| {
-        //     let chars: std::collections::HashSet<char> = word.chars().collect();
-        //     chars.len() == word.len()
-        // })
         .collect::<Vec<String>>();
     Ok(words)
 }
 
-fn get_permutations(letters: &[[char; 3]; 4]) -> io::Result<HashSet<String>>{
-    let mut permutations : HashSet<String> = HashSet::new();
+fn get_permutations(letters: &[[char; 3]; 4]) -> io::Result<Vec<String>>{
+    let mut permutations : Vec<String> = Vec::new();
     for side in letters{
         permutations.extend(
             side
             .iter()
             .permutations(2)
             .map(|combo| combo.into_iter().collect::<String>())
-            .collect::<HashSet<String>>())
+            .collect::<Vec<String>>())
     }
     Ok(permutations)
-
-}
-
-fn create_file<P: AsRef<Path>>(word_struct_path: P, word_list_path: P) -> io::Result<HashMap<String, HashSet<String>>> {
-    //let mut file = File::create(path)?;
-    let words = read_words_from_file(word_list_path)?;
-    //println!("{}", words.contains(&"PROMOTION".to_string()));
-    let mut substrings_map: HashMap<String, HashSet<String>> = HashMap::new();
-
-    for word in words.iter().cloned() {
-        // Only process words that are at least 2 characters long
-        if word.len() >= 3 {
-            // let substrings = (0..word.len() - 1)
-            //     .map(|i| word[i..i + 2].to_string())
-            //     .collect::<Vec<String>>();
-            let mut substrings = HashSet::new();
-            for w in word
-                .chars()
-                .collect::<Vec<char>>()
-                .windows(2) {
-                    //let pair = (w[0], w[1]); // or format!("{}{}", window[0], window[1]) for string pairs
-                    substrings
-                    .insert(format!("{}{}", w[0], w[1]));
-                }
-            substrings_map.insert(word, substrings);
-        } 
-    }
-    let mut json_map = object!{};
-
-    for (key, values) in &substrings_map {
-        // Manually create a JsonValue array
-        let mut json_array = JsonValue::new_array();
-        for val in values {
-            // Push each value into the array
-            json_array.push(val.as_str()).unwrap();  // val.as_str() converts &String to &str
-        }
-    
-        json_map[key] = json_array;
-    }
-
-    // Convert the JSON object to a string
-    let serialized = json_map.dump();
-
-    // Write to a file
-    fs::write(word_struct_path, serialized)?;
-    //file.write_all(b"Initial content")?;  // Optional: Write some initial content to the file
-    Ok(substrings_map.clone())
 }
 
 

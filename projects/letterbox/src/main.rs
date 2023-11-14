@@ -69,6 +69,59 @@ pub fn get_valid_words(words: &Vec<String>, permutations: &Vec<String>, letters_
     Ok(valid_words)
 }
 
+pub fn get_valid_words_v1(words: &Vec<String>, permutations: &Vec<String>, letters_flat: &Vec<char>) -> io::Result<Vec<String>> {
+    let valid_perms: Vec<u16> = permutations
+        .iter()
+        .map(|perm| {
+            perm
+            .as_bytes()
+            .windows(2)
+            .map(|p| {
+                // apply modulus 32 on each element of the slice and collect into a 16 bit integer 
+                (p[0] as u16 % 32) << 5 | (p[1] as u16 % 32)
+            })
+            .fold(0, |_, hash| hash)
+        })
+        .collect();
+        
+    let mut valid_words_idx = Vec::new();
+    let mut invalid = false;
+    for (widx, word) in words.into_iter().enumerate() {
+        let mut idx = 0;
+        while let Some(slice) = word.as_bytes().get(idx..idx + 2) {
+            // assume reading from word_list with no repeating characters, so dont check for repeating characters
+
+            // apply modulus 32 on each element of the slice and collect into a 16 bit integer
+            let hash = (slice[0] as u16 % 32) << 5 | (slice[1] as u16 % 32);
+            if !valid_perms.contains(&hash) {
+                // break and continue to next word
+                invalid = true;
+                break;
+            }
+            idx += 1;
+        }
+        match invalid {
+            true => invalid = false,
+            false => valid_words_idx.push(widx),
+        }
+    }
+
+    // filter for valid words
+    let valid_words: Vec<String> = valid_words_idx
+        .iter()
+        .map(|&idx| &words[idx])
+        .filter(|word| {
+            word
+            .chars()
+            .all(|c| letters_flat.contains(&c))
+        })
+        .cloned()
+        .collect();
+
+    // return valid words
+    Ok(valid_words)
+}
+
 pub fn flatten(letters: &[[char; 3]; 4]) -> Vec<char> {
     let mut letters_flat: Vec<char> = Vec::new();
     for side in letters {
@@ -84,7 +137,8 @@ fn main() -> result::Result<(), Box<dyn error::Error>> {
     let t0 = time::Instant::now();
 
     // file paths
-    let word_list_path = "word_list.txt";
+    // let word_list_path = "word_list.txt";
+    let word_list_path = "word_list_no_repeat.txt";
 
     // input letters
     let letters = [
@@ -93,13 +147,20 @@ fn main() -> result::Result<(), Box<dyn error::Error>> {
         ['L', 'A', 'T'],
         ['I', 'H', 'V']];
     let letters_flat: Vec<char> = flatten(&letters);
-    let permutations = get_permutations(&letters)?;
+    let invalid_permutations = get_invalid_permutations(&letters)?;
+    let valid_permutations = get_valid_permutations(&letters)?;
+
+    // print valid permutations
+    println!("{:?}", valid_permutations);
+    // check if YA is in valid permutations
+    println!("{:?}", valid_permutations.contains(&"YA".to_string()));
 
     // load words from file
     let words = read_words_from_file(word_list_path)?;
 
     // filter words
-    let valid_words = get_valid_words(&words, &permutations, &letters_flat)?;
+    // let valid_words = get_valid_words(&words, &invalid_permutations, &letters_flat)?;
+    let valid_words = get_valid_words_v1(&words, &valid_permutations, &letters_flat)?;
 
     let mut list: Vec<(String,String)> = Vec::new();
     for word1 in &valid_words {
@@ -147,7 +208,7 @@ fn read_words_from_file<P: AsRef<Path>>(path: P) -> io::Result<Vec<String>> {
     Ok(words)
 }
 
-fn get_permutations(letters: &[[char; 3]; 4]) -> io::Result<Vec<String>>{
+fn get_invalid_permutations(letters: &[[char; 3]; 4]) -> io::Result<Vec<String>>{
     let mut permutations : Vec<String> = Vec::new();
     for side in letters{
         permutations.extend(
@@ -156,6 +217,29 @@ fn get_permutations(letters: &[[char; 3]; 4]) -> io::Result<Vec<String>>{
             .permutations(2)
             .map(|combo| combo.into_iter().collect::<String>())
             .collect::<Vec<String>>())
+    }
+    Ok(permutations)
+}
+
+fn get_valid_permutations(letters: &[[char; 3]; 4]) -> io::Result<Vec<String>>{
+    let mut permutations : Vec<String> = Vec::new();
+    for side in letters {
+        for other_side in letters {
+            // only works because assuming characters are all unique
+            if side[0] == other_side[0] { continue }
+            // iterate through characters of side, permute with other_side, and collect into a vector of strings
+            for sl in side {
+                // loop through otherside
+                for osl in other_side {
+                    // concatenate sl and osl into a string
+                    let mut perm = String::new();
+                    perm.push(*sl);
+                    perm.push(*osl);
+                    // push perm into permutations
+                    permutations.push(perm);
+                }
+            }
+        }
     }
     Ok(permutations)
 }

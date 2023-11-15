@@ -86,20 +86,6 @@ fn main() -> io::Result<()> {
         .collect();
     filtered_words.sort();
 
-
-    // //println!("{:?}", filtered_words);
-    // //println!("{:?}", filtered_words.len());
-    // let mut test_var:Vec<String>= hashmap.iter()
-    // .filter(|&(_, values)| {
-    //     !values.iter().any(|value| permutations.contains(value))
-    // })
-    // .map(|(key, _)| key)
-    // .collect();
-    // test_var.sort();
-    // println!("{:?}", test_var);
-
-
-
     let mut list: Vec<(String,String)> = Vec::new();
 
     for word1 in &filtered_words {
@@ -111,7 +97,7 @@ fn main() -> io::Result<()> {
                 if letters_flat.iter().all(|&c| concatenated.contains(c)){
                     list.push((word1.clone(), word2.clone()));
                 }
-                // else{
+                // else {
                 //     for word3 in &filtered_words {
                 //         // Check if the last character of word2 matches the first character of word3
                 //         if word2.ends_with(&word3[0..1]) {
@@ -143,10 +129,6 @@ fn read_words_from_file<P: AsRef<Path>>(path: P) -> io::Result<Vec<String>> {
     let words = reader
         .lines()
         .filter_map(Result::ok)
-        // .filter(|word| {
-        //     let chars: std::collections::HashSet<char> = word.chars().collect();
-        //     chars.len() == word.len()
-        // })
         .collect::<Vec<String>>();
     Ok(words)
 }
@@ -207,7 +189,6 @@ fn create_file<P: AsRef<Path>>(word_struct_path: P, word_list_path: P) -> io::Re
 
     // Write to a file
     fs::write(word_struct_path, serialized)?;
-    //file.write_all(b"Initial content")?;  // Optional: Write some initial content to the file
     Ok(substrings_map.clone())
 }
 

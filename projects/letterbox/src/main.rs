@@ -5,6 +5,7 @@ use std::fs::File;
 use std::path::Path;
 use itertools::Itertools;
 use std::io::{self, BufRead};
+use std::collections::HashSet;
 
 pub fn get_valid_words(words: &Vec<String>, permutations: &Vec<String>, letters_flat: &Vec<char>) -> io::Result<Vec<String>> {
     let invalid_perms: Vec<u16> = permutations
@@ -69,21 +70,22 @@ pub fn get_valid_words(words: &Vec<String>, permutations: &Vec<String>, letters_
     Ok(valid_words)
 }
 
-pub fn get_valid_words_v1(words: &Vec<String>, permutations: &Vec<String>, letters_flat: &Vec<char>) -> io::Result<Vec<String>> {
-    let valid_perms: Vec<u16> = permutations
+pub fn get_valid_words_v1(words: &Vec<String>, permutations: &Vec<String>) -> io::Result<Vec<String>> {
+    let valid_perms: HashSet<u16> = permutations
         .iter()
         .map(|perm| {
             perm
             .as_bytes()
             .windows(2)
-            .map(|p| {
-                // apply modulus 32 on each element of the slice and collect into a 16 bit integer 
-                (p[0] as u16 % 32) << 5 | (p[1] as u16 % 32)
-            })
+            .map(|p| { (p[0] as u16 % 32) << 5 | (p[1] as u16 % 32) })
             .fold(0, |_, hash| hash)
         })
         .collect();
+
+    // // print my permutations
+    // println!("{:?}", valid_perms);
         
+    // let mut valid_words = Vec::new();
     let mut valid_words_idx = Vec::new();
     let mut invalid = false;
     for (widx, word) in words.into_iter().enumerate() {
@@ -102,7 +104,10 @@ pub fn get_valid_words_v1(words: &Vec<String>, permutations: &Vec<String>, lette
         }
         match invalid {
             true => invalid = false,
-            false => valid_words_idx.push(widx),
+            false => {
+                // valid_words.push(word.clone());
+                valid_words_idx.push(widx);
+            }
         }
     }
 
@@ -110,13 +115,11 @@ pub fn get_valid_words_v1(words: &Vec<String>, permutations: &Vec<String>, lette
     let valid_words: Vec<String> = valid_words_idx
         .iter()
         .map(|&idx| &words[idx])
-        // .filter(|word| {
-        //     word
-        //     .chars()
-        //     .all(|c| letters_flat.contains(&c))
-        // })
         .cloned()
         .collect();
+
+    // print length of valid words
+    println!("{:?}", valid_words.len());
 
     // return valid words
     Ok(valid_words)
@@ -126,7 +129,8 @@ pub fn flatten(letters: &[[char; 3]; 4]) -> Vec<char> {
     let mut letters_flat: Vec<char> = Vec::new();
     for side in letters {
         for letter in side {
-            letters_flat.push(*letter);
+            // letters_flat.push(*letter as u8 % 32);
+            letters_flat.push(letter.to_ascii_uppercase());
         }
     }
     letters_flat
@@ -142,25 +146,22 @@ fn main() -> result::Result<(), Box<dyn error::Error>> {
 
     // input letters
     let letters = [
-        ['S', 'Y', 'C'],
-        ['B', 'R', 'N'],
-        ['L', 'A', 'T'],
-        ['I', 'H', 'V']];
+        ['i', 'f', 't'],
+        ['m', 'a', 'o'],
+        ['d', 'r', 'w'],
+        ['e', 'l', 'h']
+    ];
+
     let letters_flat: Vec<char> = flatten(&letters);
     //let invalid_permutations = get_invalid_permutations(&letters)?;
     let valid_permutations = get_valid_permutations(&letters)?;
-
-    // print valid permutations
-    println!("{:?}", valid_permutations);
-    // check if YA is in valid permutations
-    println!("{:?}", valid_permutations.contains(&"YA".to_string()));
 
     // load words from file
     let words = read_words_from_file(word_list_path)?;
 
     // filter words
     // let valid_words = get_valid_words(&words, &invalid_permutations, &letters_flat)?;
-    let valid_words = get_valid_words_v1(&words, &valid_permutations, &letters_flat)?;
+    let valid_words = get_valid_words_v1(&words, &valid_permutations)?;
 
     let mut list: Vec<(String,String)> = Vec::new();
     for word1 in &valid_words {
@@ -169,9 +170,12 @@ fn main() -> result::Result<(), Box<dyn error::Error>> {
             // Check if the last character of word1 matches the first character of word2
             if word1.ends_with(&word2[0..1]) {
                 let concatenated = format!("{}{}", word1, word2);
-                if letters_flat.iter().all(|&c| concatenated.contains(c)){
+                if letters_flat.iter().all(|&c| concatenated.contains(c)) {
                     list.push((word1.clone(), word2.clone()));
                 }
+                // if letters_flat.iter().all(|&l| concatenated.chars().any(|c| c as u8 % 32 == l)) {
+                //     list.push((word1.clone(), word2.clone()));
+                // }
                 // else {
                 //     for word3 in &filtered_words {
                 //         // Check if the last character of word2 matches the first character of word3

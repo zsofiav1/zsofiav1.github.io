@@ -110,11 +110,11 @@ pub fn get_valid_words_v1(words: &Vec<String>, permutations: &Vec<String>, lette
     let valid_words: Vec<String> = valid_words_idx
         .iter()
         .map(|&idx| &words[idx])
-        .filter(|word| {
-            word
-            .chars()
-            .all(|c| letters_flat.contains(&c))
-        })
+        // .filter(|word| {
+        //     word
+        //     .chars()
+        //     .all(|c| letters_flat.contains(&c))
+        // })
         .cloned()
         .collect();
 
@@ -147,7 +147,7 @@ fn main() -> result::Result<(), Box<dyn error::Error>> {
         ['L', 'A', 'T'],
         ['I', 'H', 'V']];
     let letters_flat: Vec<char> = flatten(&letters);
-    let invalid_permutations = get_invalid_permutations(&letters)?;
+    //let invalid_permutations = get_invalid_permutations(&letters)?;
     let valid_permutations = get_valid_permutations(&letters)?;
 
     // print valid permutations

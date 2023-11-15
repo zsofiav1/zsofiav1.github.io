@@ -147,13 +147,13 @@ fn main() -> result::Result<(), Box<dyn error::Error>> {
         ['L', 'A', 'T'],
         ['I', 'H', 'V']];
     let letters_flat: Vec<char> = flatten(&letters);
-    let invalid_permutations = get_invalid_permutations(&letters)?;
+    // let invalid_permutations = get_invalid_permutations(&letters)?;
     let valid_permutations = get_valid_permutations(&letters)?;
 
-    // print valid permutations
-    println!("{:?}", valid_permutations);
-    // check if YA is in valid permutations
-    println!("{:?}", valid_permutations.contains(&"YA".to_string()));
+    // // print valid permutations
+    // println!("{:?}", valid_permutations);
+    // // check if YA is in valid permutations
+    // println!("{:?}", valid_permutations.contains(&"YA".to_string()));
 
     // load words from file
     let words = read_words_from_file(word_list_path)?;

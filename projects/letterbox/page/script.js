@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', drawPolygon);
-document.addEventListener('input', drawPolygon);
+document.getElementById('polygon').addEventListener('input', drawPolygon);
 
 function drawPolygon() {
     // log i am here
@@ -171,9 +171,11 @@ function drawPolygon() {
 document.getElementById('sides-slider').addEventListener('input', function() {
     var polygon = document.getElementById('polygon');
     polygon.setAttribute('data-sides', this.value);
+    drawPolygon();
 });
 
 document.getElementById('inputs-slider').addEventListener('input', function() {
     var polygon = document.getElementById('polygon');
     polygon.setAttribute('data-num-inputs', this.value);
+    drawPolygon();
 });

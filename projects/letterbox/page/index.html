@@ -4,10 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Shape Creator</title>
-    <link rel="stylesheet" type="text/css" href="style.css?v=1.1">
+    <!-- <link rel="stylesheet" type="text/css" href="style.css?v=1.1"> -->
 </head>
 <body>
-    <div class="polygon" data-sides="4" data-radius="10" data-border-thickness="0.5" data-body-color="pink" data-border-color="red"></div>
-    <script src="script.js?v=1.0"></script>
+    <label for="sides-slider">Number of Sides:</label>
+    <input type="range" id="sides-slider" min="3" max="10" value="4" step="1">
+    <label for="inputs-slider">Number of Inputs:</label>
+    <input type="range" id="inputs-slider" min="3" max="10" value="3" step="1">
+    <div class="polygon"
+            id="polygon"
+            data-num-inputs="3"
+            data-sides="4"
+            data-radius="40"
+            data-border-thickness="0.5"
+            data-body-color="pink"
+            data-border-color="red">
+    </div>
+    <script src="script.js?v=1.3"></script>
 </body>
 </html>

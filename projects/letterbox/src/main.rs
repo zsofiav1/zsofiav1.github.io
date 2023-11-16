@@ -48,7 +48,7 @@ fn main() -> result::Result<(), Box<dyn error::Error>> {
     // ---------------------------------------------------------------------------------------------
     // file path to word list (with no repeating characters), and load
     // ---------------------------------------------------------------------------------------------
-    let word_list_path = "word_list_no_repeat.txt";
+    let word_list_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("data").join("word_list_no_repeat.txt");
     let words = read_words_from_file(word_list_path)?;
     // ---------------------------------------------------------------------------------------------
     // flatten + uppercase the input letters, and pre-calculate the valid permutations

@@ -103,9 +103,10 @@ impl LetterShape {
         // ---------------------------------------------------------------------------------------------
         // print results
         // ---------------------------------------------------------------------------------------------
-        println!("{:?}", solutions);
-        println!("{:?} results", solutions.len());
-        Ok(to_value(&solutions).unwrap())
+        let result = format!("{:?}", solutions);
+        // println!("{:?} results", solutions.len());
+        // Ok(to_value(&result).unwrap())
+        Ok(result.into())
     }
 }
 

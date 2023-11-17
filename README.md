@@ -13,4 +13,4 @@
     wasm-bindgen = "0.2"
 ```
 3. `cargo build`
-4. `wasm-pack build --release --target web --out-dir <OUT_DIR>`
+4. `wasm-pack build --release --target web --no-typescript --out-dir <OUT_DIR>`

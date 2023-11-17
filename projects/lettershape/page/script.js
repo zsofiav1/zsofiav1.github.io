@@ -2,9 +2,12 @@ import * as wasm from './pkg/lettershape.js';
 
 async function run() {
     await wasm.default(); // Initializes the WASM module.
+}
+
+async function get_solution() {
     let letterShape = wasm.LetterShape.new("ift;mao;drw;elh");
-    await letterShape.solve();
-    // console.log(letterShape.solve());
+    let solution = await letterShape.solve();
+    return solution;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -40,6 +43,9 @@ function loadSequence() {
     setInputMax();
     drawPolygon();
     run().catch(console.error);
+    get_solution().then(solution => {
+        console.log(solution);
+    }).catch(console.error);
 }
 
 function drawPolygon() {

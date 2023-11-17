@@ -1,13 +1,13 @@
 // ---------------------------------------------------------------------------------------------
 // external
 // ---------------------------------------------------------------------------------------------
-use web_sys::console;
-use std::{fs::File, path::PathBuf};
 use std::path::Path;
+// use web_sys::console;
+use std::path::PathBuf;
 use reqwasm::http::Request;
-use std::io::{self, BufRead};
 use wasm_bindgen::prelude::*;
 use std::collections::HashSet;
+use serde_wasm_bindgen::to_value;
 
 #[wasm_bindgen]
 pub struct LetterShape {
@@ -74,7 +74,6 @@ impl LetterShape {
         // file path to word list (with no repeating characters), and load
         // ---------------------------------------------------------------------------------------------
         let word_list_path = Path::new("..").join("data").join("word_list_no_repeat.txt");
-        console::log_1(&word_list_path.display().to_string().into());
         let words = read_words_from_request(word_list_path).await;
         let words = match words {
             Ok(words) => words,
@@ -106,7 +105,7 @@ impl LetterShape {
         // ---------------------------------------------------------------------------------------------
         println!("{:?}", solutions);
         println!("{:?} results", solutions.len());
-        Ok(JsValue::from_str("OKAY"))
+        Ok(to_value(&solutions).unwrap())
     }
 }
 
@@ -312,25 +311,6 @@ pub fn split_using_delimiter(s: &str, delimiter: char) -> Vec<Vec<char>> {
         .map(|s| s.chars().collect())
         .collect()
 }
-
-// /// Reads words from a file, delimited by newline, and returns them as a vector of strings.
-// /// 
-// /// # Arguments
-// /// 
-// /// * `path` - A path to the file to be read.
-// /// 
-// /// # Returns
-// /// 
-// /// * `Vec<String>` - A vector of strings containing the words read from the file.
-// fn read_words_from_file<P: AsRef<Path>>(path: P) -> io::Result<Vec<String>> {
-//     let file = File::open(path)?;
-//     let reader = io::BufReader::new(file);
-//     let words = reader
-//         .lines()
-//         .filter_map(Result::ok)
-//         .collect::<Vec<String>>();
-//     Ok(words)
-// }
 
 /// Reads words from a request given a file path.
 ///

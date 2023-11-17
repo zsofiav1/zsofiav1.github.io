@@ -1,9 +1,10 @@
 // ---------------------------------------------------------------------------------------------
 // external
 // ---------------------------------------------------------------------------------------------
-use std::time;
-use std::fs::File;
+use web_sys::console;
+use std::{fs::File, path::PathBuf};
 use std::path::Path;
+use reqwasm::http::Request;
 use std::io::{self, BufRead};
 use wasm_bindgen::prelude::*;
 use std::collections::HashSet;
@@ -29,11 +30,11 @@ pub struct LetterShape {
 /// # Example
 /// 
 /// ```no_run
-/// let letters = [
-///     ['i', 'f', 't'],
-///     ['m', 'a', 'o'],
-///     ['d', 'r', 'w'],
-///     ['e', 'l', 'h']
+/// let letters = vec![
+///     vec!['i', 'f', 't'],
+///     vec!['m', 'a', 'o'],
+///     vec!['d', 'r', 'w'],
+///     vec!['e', 'l', 'h']
 /// ];
 /// 
 /// // ...
@@ -63,36 +64,23 @@ impl LetterShape {
     /// This method attempts to solve the problem and returns a `Result` indicating success or failure.
     /// If the problem is solved successfully, it returns `Ok(())`. Otherwise, it returns an `Err` containing
     /// a boxed `dyn Error` trait object that describes the error encountered during solving.
-    pub fn solve(&self) -> Result<JsValue, JsValue> {
-        // ---------------------------------------------------------------------------------------------
-        // start timer
-        // ---------------------------------------------------------------------------------------------
-        let t0 = time::Instant::now();
+    pub async fn solve(&self) -> Result<JsValue, JsValue> {
+        
         // ---------------------------------------------------------------------------------------------
         // get the letters and convert them to a Vec<Vec<char>>
         // ---------------------------------------------------------------------------------------------
         let letters = &self.letters;
-        // let letters = [
-        //     ['i', 'f', 't'],
-        //     ['m', 'a', 'o'],
-        //     ['d', 'r', 'w'],
-        //     ['e', 'l', 'h']
-        // ];
-        // // convert to Vec<Vec<char>>
-        // let letters: Vec<Vec<char>> = letters
-        //     .iter()
-        //     .map(|side| side.to_vec())
-        //     .collect();
         // ---------------------------------------------------------------------------------------------
         // file path to word list (with no repeating characters), and load
         // ---------------------------------------------------------------------------------------------
-        let word_list_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("data").join("word_list_no_repeat.txt");
-        let words = read_words_from_file(word_list_path);
+        let word_list_path = Path::new("..").join("data").join("word_list_no_repeat.txt");
+        console::log_1(&word_list_path.display().to_string().into());
+        let words = read_words_from_request(word_list_path).await;
         let words = match words {
             Ok(words) => words,
-            Err(_e) => return Err(JsValue::from_str("ERROR: could not read word list from file")),
+            Err(e) => return Err(e),
+            // Err(_e) => return Err(JsValue::from_str("ERROR: could not read word list from file")),
             // Err(e) => return "ERROR: could not read word list from file".into(),
-            // Err(e) => return Err(Box::new(e)),
         };
         // ---------------------------------------------------------------------------------------------
         // flatten + uppercase the input letters, and pre-calculate the valid permutations
@@ -116,12 +104,9 @@ impl LetterShape {
         // ---------------------------------------------------------------------------------------------
         // print results
         // ---------------------------------------------------------------------------------------------
-        let elapsed = time::Instant::now() - t0;
         println!("{:?}", solutions);
         println!("{:?} results", solutions.len());
-        println!("{:?} seconds", elapsed.as_secs_f32());
         Ok(JsValue::from_str("OKAY"))
-        // Ok(())
     }
 }
 
@@ -328,21 +313,63 @@ pub fn split_using_delimiter(s: &str, delimiter: char) -> Vec<Vec<char>> {
         .collect()
 }
 
-/// Reads words from a file, delimited by newline, and returns them as a vector of strings.
-/// 
+// /// Reads words from a file, delimited by newline, and returns them as a vector of strings.
+// /// 
+// /// # Arguments
+// /// 
+// /// * `path` - A path to the file to be read.
+// /// 
+// /// # Returns
+// /// 
+// /// * `Vec<String>` - A vector of strings containing the words read from the file.
+// fn read_words_from_file<P: AsRef<Path>>(path: P) -> io::Result<Vec<String>> {
+//     let file = File::open(path)?;
+//     let reader = io::BufReader::new(file);
+//     let words = reader
+//         .lines()
+//         .filter_map(Result::ok)
+//         .collect::<Vec<String>>();
+//     Ok(words)
+// }
+
+/// Reads words from a request given a file path.
+///
 /// # Arguments
-/// 
-/// * `path` - A path to the file to be read.
-/// 
+///
+/// * `path` - The file path to read from.
+///
 /// # Returns
-/// 
-/// * `Vec<String>` - A vector of strings containing the words read from the file.
-fn read_words_from_file<P: AsRef<Path>>(path: P) -> io::Result<Vec<String>> {
-    let file = File::open(path)?;
-    let reader = io::BufReader::new(file);
-    let words = reader
-        .lines()
-        .filter_map(Result::ok)
-        .collect::<Vec<String>>();
+///
+/// A `Result` containing a vector of strings if the operation is successful, or a `JsValue` if an error occurs.
+///
+/// # Examples
+///
+/// ```rust
+/// use std::path::PathBuf;
+///
+/// let path = PathBuf::from("/path/to/file.txt");
+/// let result = read_words_from_request(path).await;
+/// match result {
+///     Ok(words) => {
+///         for word in words {
+///             println!("{}", word);
+///         }
+///     }
+///     Err(error) => {
+///         console.error("An error occurred:", error);
+///     }
+/// }
+/// ```
+async fn read_words_from_request(path: PathBuf) -> Result<Vec<String>, JsValue> {
+    let path = path.display().to_string();
+    let response = Request::get(&path)
+        .send()
+        .await
+        .map_err(|_| JsValue::from_str("Failed to fetch file"))?;
+    let text = response
+        .text()
+        .await
+        .map_err(|_| JsValue::from_str("Failed to read response text"))?;
+    let words = text.lines().map(str::to_owned).collect::<Vec<String>>();
     Ok(words)
 }

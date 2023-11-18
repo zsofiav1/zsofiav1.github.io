@@ -87,7 +87,7 @@ window.addEventListener('resize', function() {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function() {
         drawPolygon();
-    }, 500);
+    }, 10);
 });
 
 

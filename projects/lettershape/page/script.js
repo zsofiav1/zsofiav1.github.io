@@ -1,9 +1,11 @@
-import init, { LetterShape, get_delim }  from './pkg/lettershape.js';
+import init, { LetterShape, delim }  from './pkg/lettershape.js';
 let DELIM = '';
+let letterShapeObj = null;
 
 async function init_wasm() {
     await init('./pkg/lettershape_bg.wasm');
-    DELIM = get_delim();
+    DELIM = delim();
+    letterShapeObj = await LetterShape.new();
 }
 
 async function run() {
@@ -41,9 +43,7 @@ async function run() {
     }
     // print the formatted letters
     console.log(formattedLetters);
-    
-    let letterShapeObj = LetterShape.new(formattedLetters);
-    let solutions = await letterShapeObj.solve();
+    let solutions = await letterShapeObj.solve(formattedLetters);
     console.log(solutions);
     // add solutions as <p> element to output div
     const output = document.getElementById('output');
@@ -81,6 +81,16 @@ document.addEventListener('DOMContentLoaded', loadSequence);
 document.getElementById('polygon').addEventListener('input', drawPolygon);
 document.getElementById('run-button').addEventListener('click', runButtonPressed);
 
+// poll the window resize, and after 500ms, redraw the polygon
+let resizeTimer;
+window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+        drawPolygon();
+    }, 500);
+});
+
+
 // ---------------------------------------------------------------------------------------------
 // load sequence
 // ---------------------------------------------------------------------------------------------
@@ -99,6 +109,7 @@ function drawPolygon() {
     const polygons = document.querySelectorAll('.polygon');
 
     polygons.forEach(function(polygon) {
+        console.log('drawing polygon');
         const sides = parseInt(polygon.dataset.sides, 10); // Number of sides as specified in data-sides attribute
         const radius = polygon.dataset.radius || DEFAULT__POLYGON_RADIUS; // Radius from data attribute, or default to 40 if not set
         const points = createRegularPolygonPoints(sides, radius);
@@ -167,6 +178,7 @@ function drawPolygon() {
         // Calculate the scale factors based on viewbox and actual size
         const scaleX = svgWidth / viewBoxWidth;
         const scaleY = svgHeight / viewBoxHeight;
+        console.log(`scaleX: ${scaleX}, scaleY: ${scaleY}`);
         
         // Draw input fields at the polygon points
         const inputs = []; // Array to hold references to all input elements
@@ -376,12 +388,11 @@ function setInputMax() {
 function scaleSliderAccordingToValue() {
     // default range for input slider is 1-13
     // default size of the input slider is 300px
-    const maxIter = 13;
     const maxPx = 300;
     // get the slider limit (max)
     let limitIter = document.getElementById('inputs-slider').getAttribute('max');    
     // get the percentage of the value in pixels
-    let percent = (limitIter / maxIter) * maxPx;
+    let percent = (limitIter / POLYGON_MAX_SIDES) * maxPx;
     // set the width of the slider to the percentage
     document.getElementById('inputs-slider').style.width = `${percent}px`;
 }

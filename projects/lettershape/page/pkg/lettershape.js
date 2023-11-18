@@ -243,8 +243,8 @@ function __wbg_adapter_20(arg0, arg1, arg2) {
 /**
 * @returns {string}
 */
-export function get_delim() {
-    const ret = wasm.get_delim();
+export function delim() {
+    const ret = wasm.delim();
     return String.fromCodePoint(ret);
 }
 
@@ -255,7 +255,7 @@ function handleError(f, args) {
         wasm.__wbindgen_exn_store(addHeapObject(e));
     }
 }
-function __wbg_adapter_64(arg0, arg1, arg2, arg3) {
+function __wbg_adapter_62(arg0, arg1, arg2, arg3) {
     _assertNum(arg0);
     _assertNum(arg1);
     wasm.wasm_bindgen__convert__closures__invoke2_mut__hdb834b082bd312c4(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
@@ -289,87 +289,16 @@ export class LetterShape {
         wasm.__wbg_lettershape_free(ptr);
     }
     /**
-    * @returns {number}
-    */
-    get num_sides() {
-        if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
-        _assertNum(this.__wbg_ptr);
-        const ret = wasm.__wbg_get_lettershape_num_sides(this.__wbg_ptr);
-        return ret >>> 0;
-    }
-    /**
-    * @param {number} arg0
-    */
-    set num_sides(arg0) {
-        if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
-        _assertNum(this.__wbg_ptr);
-        _assertNum(arg0);
-        wasm.__wbg_set_lettershape_num_sides(this.__wbg_ptr, arg0);
-    }
-    /**
-    * @returns {number}
-    */
-    get num_inputs_per_side() {
-        if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
-        _assertNum(this.__wbg_ptr);
-        const ret = wasm.__wbg_get_lettershape_num_inputs_per_side(this.__wbg_ptr);
-        return ret >>> 0;
-    }
-    /**
-    * @param {number} arg0
-    */
-    set num_inputs_per_side(arg0) {
-        if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
-        _assertNum(this.__wbg_ptr);
-        _assertNum(arg0);
-        wasm.__wbg_set_lettershape_num_inputs_per_side(this.__wbg_ptr, arg0);
-    }
-    /**
-    * @returns {string}
-    */
-    get delim() {
-        if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
-        _assertNum(this.__wbg_ptr);
-        const ret = wasm.__wbg_get_lettershape_delim(this.__wbg_ptr);
-        return String.fromCodePoint(ret);
-    }
-    /**
-    * @param {string} arg0
-    */
-    set delim(arg0) {
-        if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
-        _assertNum(this.__wbg_ptr);
-        wasm.__wbg_set_lettershape_delim(this.__wbg_ptr, arg0.codePointAt(0));
-    }
-    /**
-    * Creates a new `LetterShape` with the given letters.
-    *
-    * # Arguments
-    *
-    * * `letters` - A string of letters, delimited by a semicolon, representing the letters to permute.
+    * Creates a new instance of `LetterShape`.
     *
     * # Returns
     *
-    * A new `LetterShape` instance.
-    * @param {string} letters
-    * @returns {LetterShape}
+    * Returns a `Result` containing the `LetterShape` instance if successful, or a `JsValue` error if an error occurs.
+    * @returns {Promise<LetterShape>}
     */
-    static new(letters) {
-        try {
-            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            const ptr0 = passStringToWasm0(letters, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-            const len0 = WASM_VECTOR_LEN;
-            wasm.lettershape_new(retptr, ptr0, len0);
-            var r0 = getInt32Memory0()[retptr / 4 + 0];
-            var r1 = getInt32Memory0()[retptr / 4 + 1];
-            var r2 = getInt32Memory0()[retptr / 4 + 2];
-            if (r2) {
-                throw takeObject(r1);
-            }
-            return LetterShape.__wrap(r0);
-        } finally {
-            wasm.__wbindgen_add_to_stack_pointer(16);
-        }
+    static new() {
+        const ret = wasm.lettershape_new();
+        return takeObject(ret);
     }
     /**
     * Solves the problem.
@@ -377,12 +306,15 @@ export class LetterShape {
     * This method attempts to solve the problem and returns a `Result` indicating success or failure.
     * If the problem is solved successfully, it returns `Ok(())`. Otherwise, it returns an `Err` containing
     * a boxed `dyn Error` trait object that describes the error encountered during solving.
+    * @param {string} letters
     * @returns {Promise<any>}
     */
-    solve() {
+    solve(letters) {
         if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
         _assertNum(this.__wbg_ptr);
-        const ret = wasm.lettershape_solve(this.__wbg_ptr);
+        const ptr0 = passStringToWasm0(letters, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.lettershape_solve(this.__wbg_ptr, ptr0, len0);
         return takeObject(ret);
     }
 }
@@ -425,6 +357,10 @@ function __wbg_get_imports() {
         const ret = getStringFromWasm0(arg0, arg1);
         return addHeapObject(ret);
     };
+    imports.wbg.__wbg_lettershape_new = function() { return logError(function (arg0) {
+        const ret = LetterShape.__wrap(arg0);
+        return addHeapObject(ret);
+    }, arguments) };
     imports.wbg.__wbindgen_object_clone_ref = function(arg0) {
         const ret = getObject(arg0);
         return addHeapObject(ret);
@@ -535,6 +471,10 @@ function __wbg_get_imports() {
         const ret = getObject(arg0).call(getObject(arg1), getObject(arg2));
         return addHeapObject(ret);
     }, arguments) };
+    imports.wbg.__wbg_now_4579335d3581594c = function() { return logError(function () {
+        const ret = Date.now();
+        return ret;
+    }, arguments) };
     imports.wbg.__wbg_new_c728d68b8b34487e = function() { return logError(function () {
         const ret = new Object();
         return addHeapObject(ret);
@@ -546,7 +486,7 @@ function __wbg_get_imports() {
                 const a = state0.a;
                 state0.a = 0;
                 try {
-                    return __wbg_adapter_64(a, state0.b, arg0, arg1);
+                    return __wbg_adapter_62(a, state0.b, arg0, arg1);
                 } finally {
                     state0.a = a;
                 }
@@ -608,8 +548,8 @@ function __wbg_get_imports() {
     imports.wbg.__wbindgen_throw = function(arg0, arg1) {
         throw new Error(getStringFromWasm0(arg0, arg1));
     };
-    imports.wbg.__wbindgen_closure_wrapper834 = function() { return logError(function (arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 100, __wbg_adapter_20);
+    imports.wbg.__wbindgen_closure_wrapper845 = function() { return logError(function (arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 106, __wbg_adapter_20);
         return addHeapObject(ret);
     }, arguments) };
 

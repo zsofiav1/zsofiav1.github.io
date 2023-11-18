@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------------------------------
 // external
 // ---------------------------------------------------------------------------------------------
+use js_sys::Date;
 use web_sys::console;
 use reqwasm::http::Request;
 use wasm_bindgen::prelude::*;
@@ -9,21 +10,18 @@ use std::collections::HashSet;
 // ---------------------------------------------------------------------------------------------
 // constants
 // ---------------------------------------------------------------------------------------------
-const DELIM: char = ';';
+// const WORDLIST_PATH_OR_URL: &str = "../data/wordlist_no_repeat.txt"; // "https://zsofiav1.github.io/projects/lettershape/data/wordlist_no_repeat.txt";
+const WORDLIST_PATH_OR_URL: &str = "https://zsofiav1.github.io/projects/lettershape/data/wordlist_no_repeat.txt";
 #[wasm_bindgen]
-pub fn get_delim() -> char {
-    DELIM
-}
+pub fn delim() -> char { DELIM_CHAR }
+const DELIM_CHAR: char = ';';
 
 // ---------------------------------------------------------------------------------------------
 // structs
 // ---------------------------------------------------------------------------------------------
 #[wasm_bindgen]
 pub struct LetterShape {
-    pub num_sides: usize,
-    pub num_inputs_per_side: usize,
-    pub delim: char,
-    letters: Vec<Vec<char>>,
+    wordlist: Option<Vec<String>>,
 }
 
 #[wasm_bindgen]
@@ -51,23 +49,17 @@ pub struct LetterShape {
 /// // solutions: [("DEFOLIATE", "EARTHWORM"), ("FLOWMETER", "RAWHIDE"), ("FLOWMETER", "RAWHIDED"), ("WEALTHIER", "REFORMED")]
 /// ```
 impl LetterShape {
-    /// Creates a new `LetterShape` with the given letters.
-    ///
-    /// # Arguments
-    ///
-    /// * `letters` - A string of letters, delimited by a semicolon, representing the letters to permute.
-    ///
+    /// Creates a new instance of `LetterShape`.
+    /// 
     /// # Returns
-    ///
-    /// A new `LetterShape` instance.
-    pub fn new(letters: &str) -> Result<LetterShape, JsValue> {
-        let letters = split_using_delimiter(letters, DELIM);
-        Ok(LetterShape {
-            num_sides: letters.len(),
-            num_inputs_per_side: letters[0].len(),
-            delim: DELIM,
-            letters: letters,
-        })
+    /// 
+    /// Returns a `Result` containing the `LetterShape` instance if successful, or a `JsValue` error if an error occurs.
+    pub async fn new() -> LetterShape {
+        let mut this = LetterShape {
+            wordlist: None,
+        };
+        this.wordlist_loaded().await;
+        this
     }
 
     /// Solves the problem.
@@ -75,22 +67,24 @@ impl LetterShape {
     /// This method attempts to solve the problem and returns a `Result` indicating success or failure.
     /// If the problem is solved successfully, it returns `Ok(())`. Otherwise, it returns an `Err` containing
     /// a boxed `dyn Error` trait object that describes the error encountered during solving.
-    pub async fn solve(&self) -> Result<JsValue, JsValue> {
-        
+    pub async fn solve(&mut self, letters: &str) -> Result<JsValue, JsValue> {
         // ---------------------------------------------------------------------------------------------
-        // get the letters and convert them to a Vec<Vec<char>>
+        // log the start time
         // ---------------------------------------------------------------------------------------------
-        let letters = &self.letters;
+        let start = Date::now();
         // ---------------------------------------------------------------------------------------------
-        // file path to word list (with no repeating characters), and load
+        // if wordlist is None, try to load it
         // ---------------------------------------------------------------------------------------------
-        // let wordlist_path_or_url = "https://zsofiav1.github.io/projects/lettershape/data/wordlist_no_repeat.txt";
-        let wordlist_path_or_url = "../data/wordlist_no_repeat.txt";
-        let words = read_words_from_request(wordlist_path_or_url).await;
-        let words = match words {
-            Ok(words) => words,
-            Err(e) => return Err(e),
-        };
+        if !self.wordlist_loaded().await {
+            return Err(JsValue::from_str("Failed to load wordlist"));
+        }
+        // ---------------------------------------------------------------------------------------------
+        // split the input letters into a Vec<Vec<char>>
+        // ---------------------------------------------------------------------------------------------
+        let letters = split_using_delimiter(letters, DELIM_CHAR);
+        if letters.iter().any(|l| l.len() != letters[0].len()) {
+            return Err(JsValue::from_str("Invalid input: each side must have the same number of letters"));
+        }
         // ---------------------------------------------------------------------------------------------
         // flatten + uppercase the input letters, and pre-calculate the valid permutations
         // ---------------------------------------------------------------------------------------------
@@ -99,7 +93,7 @@ impl LetterShape {
         // ---------------------------------------------------------------------------------------------
         // get the valid words from the word list
         // ---------------------------------------------------------------------------------------------
-        let valid_words = get_valid_words(&words, &valid_permutations);
+        let valid_words = get_valid_words(self.wordlist.as_ref().unwrap(), &valid_permutations);
         // ---------------------------------------------------------------------------------------------
         // get the valid two-word solutions
         // ---------------------------------------------------------------------------------------------
@@ -117,9 +111,34 @@ impl LetterShape {
         // ---------------------------------------------------------------------------------------------
         // print results
         // ---------------------------------------------------------------------------------------------
-        let result = format!("{:?}", solutions);
         console::log_1(&result.clone().into());
+        console::log_1(&format!("Elapsed time: {} ms", Date::now() - start).into());
         Ok(result.into())
+    }
+
+    /// Asynchronously checks if the wordlist has been loaded.
+    /// 
+    /// # Returns
+    /// 
+    /// Returns `true` if the wordlist has been loaded, otherwise `false`.
+    async fn wordlist_loaded(&mut self) -> bool {
+        match &self.wordlist {
+            Some(_) => true,
+            None => {
+                let words = read_words_from_request(WORDLIST_PATH_OR_URL).await;
+                self.wordlist = match words {
+                    Ok(words) => Some(words),
+                    Err(e) => {
+                        console::log_1(&e.into());
+                        None
+                    },
+                };
+                match &self.wordlist {
+                    Some(_) => true,
+                    None => false,
+                }
+            },
+        }
     }
 }
 

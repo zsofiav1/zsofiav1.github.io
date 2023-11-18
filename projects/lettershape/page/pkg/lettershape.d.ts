@@ -3,64 +3,44 @@
 /**
 * @returns {string}
 */
-export function get_delim(): string;
+export function delim(): string;
 /**
 */
 export class LetterShape {
   free(): void;
 /**
-* Creates a new `LetterShape` with the given letters.
-*
-* # Arguments
-*
-* * `letters` - A string of letters, delimited by a semicolon, representing the letters to permute.
-*
+* Creates a new instance of `LetterShape`.
+* 
 * # Returns
-*
-* A new `LetterShape` instance.
-* @param {string} letters
-* @returns {LetterShape}
+* 
+* Returns a `Result` containing the `LetterShape` instance if successful, or a `JsValue` error if an error occurs.
+* @returns {Promise<LetterShape>}
 */
-  static new(letters: string): LetterShape;
+  static new(): Promise<LetterShape>;
 /**
 * Solves the problem.
 *
 * This method attempts to solve the problem and returns a `Result` indicating success or failure.
 * If the problem is solved successfully, it returns `Ok(())`. Otherwise, it returns an `Err` containing
 * a boxed `dyn Error` trait object that describes the error encountered during solving.
+* @param {string} letters
 * @returns {Promise<any>}
 */
-  solve(): Promise<any>;
-/**
-*/
-  delim: string;
-/**
-*/
-  num_inputs_per_side: number;
-/**
-*/
-  num_sides: number;
+  solve(letters: string): Promise<any>;
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly get_delim: () => number;
+  readonly delim: () => number;
   readonly __wbg_lettershape_free: (a: number) => void;
-  readonly __wbg_get_lettershape_num_sides: (a: number) => number;
-  readonly __wbg_set_lettershape_num_sides: (a: number, b: number) => void;
-  readonly __wbg_get_lettershape_num_inputs_per_side: (a: number) => number;
-  readonly __wbg_set_lettershape_num_inputs_per_side: (a: number, b: number) => void;
-  readonly __wbg_get_lettershape_delim: (a: number) => number;
-  readonly __wbg_set_lettershape_delim: (a: number, b: number) => void;
-  readonly lettershape_new: (a: number, b: number, c: number) => void;
-  readonly lettershape_solve: (a: number) => number;
+  readonly lettershape_new: () => number;
+  readonly lettershape_solve: (a: number, b: number, c: number) => number;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_export_2: WebAssembly.Table;
   readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hf6cf0eb02bab5edb: (a: number, b: number, c: number) => void;
-  readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_exn_store: (a: number) => void;
   readonly wasm_bindgen__convert__closures__invoke2_mut__hdb834b082bd312c4: (a: number, b: number, c: number, d: number) => void;
 }

@@ -1,13 +1,56 @@
-import * as wasm from './pkg/lettershape.js';
+import init, { LetterShape, get_delim }  from './pkg/lettershape.js';
+let DELIM = '';
 
-async function run() {
-    await wasm.default(); // Initializes the WASM module.
+async function init_wasm() {
+    await init('./pkg/lettershape_bg.wasm');
+    DELIM = get_delim();
 }
 
-async function get_solution() {
-    let letterShape = wasm.LetterShape.new("ift;mao;drw;elh");
-    let solution = await letterShape.solve();
-    return solution;
+async function run() {
+    // get the letters of my inputs
+    const inputs = document.querySelectorAll('.polygon-input');
+    const letters = [];
+    let allLetters = true;
+    // if input is '', set allLetters to false and break
+    for (let i = 0; i < inputs.length; i++) {
+        if (inputs[i].value === '') {
+            allLetters = false;
+            break;
+        }
+        letters.push(inputs[i].value);
+    }
+    // if all letters are entered, get the number of sides and format the letters using the delim
+    // for example
+    // - sides=2
+    // - number of inputs per side = 3
+    // - letters = [a, b, c, d, e, f]
+    // - DELIM = ';'
+    // then the formatted letters = 'abc;def'
+    let formattedLetters = '';
+    if (allLetters) {
+        const sides = parseInt(document.getElementById('sides-slider').value);
+        const numInputsPerSide = parseInt(document.getElementById('inputs-slider').value);
+        for (let i = 0; i < sides; i++) {
+            for (let j = 0; j < numInputsPerSide; j++) {
+                formattedLetters += letters[(i * numInputsPerSide) + j];
+            }
+            if (i < sides - 1) {
+                formattedLetters += DELIM;
+            }
+        }
+    }
+    // print the formatted letters
+    console.log(formattedLetters);
+    
+    let letterShapeObj = LetterShape.new(formattedLetters);
+    let solutions = await letterShapeObj.solve();
+    console.log(solutions);
+    // add solutions as <p> element to output div
+    const output = document.getElementById('output');
+    output.innerHTML = '';
+    let p = document.createElement('p');
+    p.innerHTML = solutions;
+    output.appendChild(p);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -33,8 +76,10 @@ const DEFAULT__CIRCLE_COLOR = DEFAULT__POLYGON_BORDER_COLOR;
 // ---------------------------------------------------------------------------------------------
 // event listeners
 // ---------------------------------------------------------------------------------------------
+document.addEventListener('DOMContentLoaded', init_wasm);
 document.addEventListener('DOMContentLoaded', loadSequence);
 document.getElementById('polygon').addEventListener('input', drawPolygon);
+document.getElementById('run-button').addEventListener('click', runButtonPressed);
 
 // ---------------------------------------------------------------------------------------------
 // load sequence
@@ -42,10 +87,10 @@ document.getElementById('polygon').addEventListener('input', drawPolygon);
 function loadSequence() {
     setInputMax();
     drawPolygon();
-    run().catch(console.error);
-    get_solution().then(solution => {
-        console.log(solution);
-    }).catch(console.error);
+}
+
+function runButtonPressed() {
+    run();
 }
 
 function drawPolygon() {

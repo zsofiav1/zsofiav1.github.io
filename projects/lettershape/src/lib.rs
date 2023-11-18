@@ -1,18 +1,28 @@
 // ---------------------------------------------------------------------------------------------
 // external
 // ---------------------------------------------------------------------------------------------
-use std::path::Path;
-// use web_sys::console;
-use std::path::PathBuf;
+use web_sys::console;
 use reqwasm::http::Request;
 use wasm_bindgen::prelude::*;
 use std::collections::HashSet;
-use serde_wasm_bindgen::to_value;
 
+// ---------------------------------------------------------------------------------------------
+// constants
+// ---------------------------------------------------------------------------------------------
+const DELIM: char = ';';
+#[wasm_bindgen]
+pub fn get_delim() -> char {
+    DELIM
+}
+
+// ---------------------------------------------------------------------------------------------
+// structs
+// ---------------------------------------------------------------------------------------------
 #[wasm_bindgen]
 pub struct LetterShape {
     pub num_sides: usize,
     pub num_inputs_per_side: usize,
+    pub delim: char,
     letters: Vec<Vec<char>>,
 }
 
@@ -22,7 +32,7 @@ pub struct LetterShape {
 /// 
 /// # Description
 /// 
-/// The NYT Letterbox puzzle is constrained to a a 4x3 array of letters
+/// The NYT Letterbox puzzle is constrained to a a 4 x 3 array of letters
 /// Given said letters, find all valid solutions where the last letter of the first word
 /// matches the first letter of the second word, and the last letter of the second word matches
 /// the first letter of the third word.
@@ -51,10 +61,11 @@ impl LetterShape {
     ///
     /// A new `LetterShape` instance.
     pub fn new(letters: &str) -> Result<LetterShape, JsValue> {
-        let letters = split_using_delimiter(letters, ';');
+        let letters = split_using_delimiter(letters, DELIM);
         Ok(LetterShape {
             num_sides: letters.len(),
             num_inputs_per_side: letters[0].len(),
+            delim: DELIM,
             letters: letters,
         })
     }
@@ -73,13 +84,12 @@ impl LetterShape {
         // ---------------------------------------------------------------------------------------------
         // file path to word list (with no repeating characters), and load
         // ---------------------------------------------------------------------------------------------
-        let word_list_path = Path::new("..").join("data").join("word_list_no_repeat.txt");
-        let words = read_words_from_request(word_list_path).await;
+        // let wordlist_path_or_url = "https://zsofiav1.github.io/projects/lettershape/data/wordlist_no_repeat.txt";
+        let wordlist_path_or_url = "../data/wordlist_no_repeat.txt";
+        let words = read_words_from_request(wordlist_path_or_url).await;
         let words = match words {
             Ok(words) => words,
             Err(e) => return Err(e),
-            // Err(_e) => return Err(JsValue::from_str("ERROR: could not read word list from file")),
-            // Err(e) => return "ERROR: could not read word list from file".into(),
         };
         // ---------------------------------------------------------------------------------------------
         // flatten + uppercase the input letters, and pre-calculate the valid permutations
@@ -97,15 +107,18 @@ impl LetterShape {
         // ---------------------------------------------------------------------------------------------
         // if there are no valid two-word solutions, get the valid three-word solutions
         // ---------------------------------------------------------------------------------------------
-        if solutions.len() == 0 {
-            let _solutions = get_three_word_solutions(&valid_words, &letters_flat);
-        }
+        let result = match solutions.len() {
+            0 => {
+                let solutions = get_three_word_solutions(&valid_words, &letters_flat);
+                format!("{:?}", solutions)
+            },
+            _ => format!("{:?}", solutions),
+        };
         // ---------------------------------------------------------------------------------------------
         // print results
         // ---------------------------------------------------------------------------------------------
         let result = format!("{:?}", solutions);
-        // println!("{:?} results", solutions.len());
-        // Ok(to_value(&result).unwrap())
+        console::log_1(&result.clone().into());
         Ok(result.into())
     }
 }
@@ -119,7 +132,7 @@ impl LetterShape {
 /// # Returns
 /// 
 /// A vector of tuples containing two valid words.
-pub fn get_two_word_solutions(valid_words: &Vec<String>, letters_flat: &Vec<char>) -> Vec<(String, String)> {
+fn get_two_word_solutions(valid_words: &Vec<String>, letters_flat: &Vec<char>) -> Vec<(String, String)> {
     let mut solution: Vec<(String, String)> = Vec::new();
     for word1 in valid_words {
         for word2 in valid_words {
@@ -147,7 +160,7 @@ pub fn get_two_word_solutions(valid_words: &Vec<String>, letters_flat: &Vec<char
 /// # Returns
 /// 
 /// A vector of tuples containing three valid words.
-pub fn get_three_word_solutions(valid_words: &Vec<String>, letters_flat: &Vec<char>) -> Vec<(String, String, String)> {
+fn get_three_word_solutions(valid_words: &Vec<String>, letters_flat: &Vec<char>) -> Vec<(String, String, String)> {
     let mut solution: Vec<(String, String, String)> = Vec::new();
     for word1 in valid_words {
         for word2 in valid_words {
@@ -184,7 +197,7 @@ pub fn get_three_word_solutions(valid_words: &Vec<String>, letters_flat: &Vec<ch
 /// # Returns
 /// 
 /// A Result containing a vector of valid words or an io::Error if an error occurred while reading the input.
-pub fn get_valid_words(words: &Vec<String>, valid_permutations: &Vec<String>) -> Vec<String> {
+fn get_valid_words(words: &Vec<String>, valid_permutations: &Vec<String>) -> Vec<String> {
     // ---------------------------------------------------------------------------------------------
     // hash valid permutations
     // ---------------------------------------------------------------------------------------------
@@ -271,7 +284,7 @@ fn get_valid_permutations(letters: &Vec<Vec<char>>) -> Vec<String>{
 /// # Returns
 /// 
 /// The computed two-character hash as a `u16`.
-pub fn two_character_hash(slice: &[u8]) -> u16 {
+fn two_character_hash(slice: &[u8]) -> u16 {
     // ---------------------------------------------------------------------------------------------
     // apply modulus 32 on each element of the slice and collect into a 16 bit integer
     // ---------------------------------------------------------------------------------------------
@@ -287,7 +300,7 @@ pub fn two_character_hash(slice: &[u8]) -> u16 {
 /// # Returns
 /// 
 /// A vector containing all characters from the input array, in flattened order and converted to uppercase.
-pub fn flatten_and_uppercase(letters: &Vec<Vec<char>>) -> Vec<char> {
+fn flatten_and_uppercase(letters: &Vec<Vec<char>>) -> Vec<char> {
     let mut result: Vec<char> = Vec::new();
     for side in letters {
         for letter in side {
@@ -307,43 +320,23 @@ pub fn flatten_and_uppercase(letters: &Vec<Vec<char>>) -> Vec<char> {
 /// # Returns
 ///
 /// A vector of vector of characters containing the substrings.
-pub fn split_using_delimiter(s: &str, delimiter: char) -> Vec<Vec<char>> {
+fn split_using_delimiter(s: &str, delimiter: char) -> Vec<Vec<char>> {
     s.split(delimiter)
         .map(|s| s.chars().collect())
         .collect()
 }
 
-/// Reads words from a request given a file path.
+/// Reads words from a given URL asynchronously.
 ///
 /// # Arguments
 ///
-/// * `path` - The file path to read from.
+/// * `url` - The URL from which to read the words.
 ///
 /// # Returns
 ///
-/// A `Result` containing a vector of strings if the operation is successful, or a `JsValue` if an error occurs.
-///
-/// # Examples
-///
-/// ```rust
-/// use std::path::PathBuf;
-///
-/// let path = PathBuf::from("/path/to/file.txt");
-/// let result = read_words_from_request(path).await;
-/// match result {
-///     Ok(words) => {
-///         for word in words {
-///             println!("{}", word);
-///         }
-///     }
-///     Err(error) => {
-///         console.error("An error occurred:", error);
-///     }
-/// }
-/// ```
-async fn read_words_from_request(path: PathBuf) -> Result<Vec<String>, JsValue> {
-    let path = path.display().to_string();
-    let response = Request::get(&path)
+/// Returns a `Result` containing a vector of strings if successful, or a `JsValue` if an error occurs.
+async fn read_words_from_request(url: &str) -> Result<Vec<String>, JsValue> {
+    let response = Request::get(url)
         .send()
         .await
         .map_err(|_| JsValue::from_str("Failed to fetch file"))?;

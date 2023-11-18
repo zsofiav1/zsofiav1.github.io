@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "files": [
     "lettershape_bg.wasm",
-    "lettershape.js"
+    "lettershape.js",
+    "lettershape.d.ts"
   ],
   "module": "lettershape.js",
+  "types": "lettershape.d.ts",
   "sideEffects": [
     "./snippets/*"
   ]

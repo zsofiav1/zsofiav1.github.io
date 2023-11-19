@@ -2,78 +2,54 @@
 <!-- comment -->
 <html lang="en">
 <head>
-    <link rel="stylesheet" type="text/css" href="stylesheets/main.css">
+    <!-- <link rel="stylesheet" type="text/css" href="stylesheets/main.css"> -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Name - Digital Resume</title>
 </head>
+
 <body>
-    <header>
-        <div class="container">
-            <h1>Your Name</h1>
-            <p>Web Developer | Designer | Your Specialty</p>
-        </div>
-        <nav>
-            <!-- Navigation links, e.g. Home, About, Contact -->
-            <a href="#">Home</a>
-            <a href="pages/projects.html">Projects</a>
-            <a href="pages/cgol">CONWAYS GAME OF BRUH</a>
-            <a href="projects/lettershape">LETTER SHAPE</a>
-            <!-- Add other links as necessary -->
-        </nav>
-    </header>
-
-    <section>
-        <div id="resume-content" class="container">
-            <h2>About Me</h2>
-            <p>
-                Write a brief paragraph about yourself, your background, and your achievements. 
-                This section is meant to give viewers a quick snapshot of who you are and what you bring to the table.
-            </p>
-
-            <div class="divider"></div>
-
-            <h2>Experience</h2>
-            
-            <div class="info-item">
-                <h3>Job Position - Company Name</h3>
-                <p>Date Started - Date Ended</p>
-                <p>
-                    A description of your role, responsibilities, and achievements at this position.
-                </p>
+    <div id="impress">
+        <!-- Base -->
+        <div id="base" class="step home" data-x="0" data-y="0" data-z="-100" data-rotate-y="0" data-rotate-z="0">
+            <div class="home">
+                <h1>Home</h1>
+                <h2>Hello impress presentation tool</h2>
             </div>
+        </div>
 
-            <!-- Repeat the above structure for other experiences -->
-
-            <div class="divider"></div>
-
-            <h2>Education</h2>
-
-            <div class="info-item">
-                <h3>Degree - University/Institution Name</h3>
-                <p>Year Started - Year Graduated</p>
-                <p>
-                    A brief description or list of courses relevant to your profession.
-                </p>
+        <div id="side1" class="step side1" data-x="-94.28" data-y="0" data-z="33.33" data-rotate-y="120" data-rotate-z="15">
+            <div class="side1">
+                <h1>Side 1</h1>
+                <h2>Hello impress presentation tool</h2>
             </div>
-
-            <!-- Repeat the above structure for other educational qualifications -->
-
-            <div class="divider"></div>
-
-            <h2>Contact</h2>
-            <p>Email: zsofiav1 [ at ] gmail [ dot ] com</p>
-            <p>LinkedIn: <a href="https://linkedin.com/in/zsofiavoros">https://linkedin.com/in/zsofiavoros</a></p>
-            <p>GitHub: <a href="https://github.com/zsofiav1">https://github.com/zsofiav1</a></p>
-            <!-- Add other contact methods if necessary -->
-
         </div>
-    </section>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2023 Your Name. All rights reserved.</p>
-        </div>
-    </footer>
+        <!-- <div id="side2" class="step side2" data-x="47.14" data-y="-81.65" data-z="33.33" data-rotate-y="-60" data-rotate-z="70.53">
+            <div class="side2">
+                <h1>Side 2</h1>
+                <h2>Hello impress presentation tool</h2>
+            </div>
+        </div> -->
+
+        <!-- <div id="side3" class="step side3" data-x="47.14" data-y="81.65" data-z="94.28" data-rotate-y="60" data-rotate-z="70.53">
+            <div class="side3">
+                <h1>Side 3</h1>
+                <h2>Hello impress presentation tool</h2>
+            </div>
+        </div> -->
+    </div>
+
+    <button id="prev">Previous</button>
+    <button id="next">Next</button>
+
+    <script src="https://cdn.jsdelivr.net/gh/impress/impress.js@2.0.0/js/impress.js"></script>
+    <script>impress().init()</script>
+    <!-- <script>
+        // on DOM load, initialize impress.js
+        document.addEventListener("DOMContentLoaded", function() {
+            impress().init();
+        });
+    </script> -->
 </body>
 </html>

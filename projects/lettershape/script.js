@@ -106,7 +106,6 @@ async function solve() {
     // ---------------------------------------------------------------------------------------------
     // display the solutions and redraw the polygon
     // ---------------------------------------------------------------------------------------------
-    console.log(solutions);
     output.innerHTML = '';
     let p = document.createElement('p');
     p.innerHTML = solutions;

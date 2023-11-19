@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My first presentation</title>
+        <!-- <link rel="stylesheet" href="./css/impress-common.css">Leave out, if you don't use impress-common.css -->
+    </head>
+    <body class="impress-not-supported">
+        <div class="fallback-message">
+            <p>Your browser <b>doesn't support the features required</b> by impress.js, so you are presented with a simplified version of this presentation.</p>
+            <p>For the best experience please use the latest <b>Chrome</b>, <b>Safari</b> or <b>Firefox</b> browser.</p>
+        </div>
+
+        <div id="impress">
+            <div id="myFirstSlide" class="step">
+                <h1>My first Slide</h1>
+            </div>
+            <div class="step Hello" data-x="1000" data-y="1000" data-z="-1000" data-scale="2" data-rotate-z="90">
+                <div class="Hello">
+                    Hello World
+                </div>  
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/gh/impress/impress.js@2.0.0/js/impress.js"></script>
+        <script>impress().init()</script>
+        <!-- <script>window.impress || document.write('<script src="https://cdn.jsdelivr.net/gh/impress/impress.js@2.0.0/js/impress.js">\x3C/script>');</script> -->
+        <!-- <script>impress().init()</script> -->
+    </body>
+</html>

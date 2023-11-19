@@ -6,7 +6,6 @@ use std::error;
 use std::result;
 use std::fs::File;
 use std::path::Path;
-use itertools::Itertools;
 use std::io::{self, BufRead};
 use std::collections::HashSet;
 

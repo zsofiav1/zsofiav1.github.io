@@ -10,8 +10,8 @@ use std::collections::HashSet;
 // ---------------------------------------------------------------------------------------------
 // constants
 // ---------------------------------------------------------------------------------------------
-// const WORDLIST_PATH_OR_URL: &str = "../data/wordlist_no_repeat.txt"; // "https://zsofiav1.github.io/projects/lettershape/data/wordlist_no_repeat.txt";
-const WORDLIST_PATH_OR_URL: &str = "https://zsofiav1.github.io/projects/lettershape/data/wordlist_no_repeat.txt";
+const WORDLIST_PATH_OR_URL: &str = "../data/wordlist_no_repeat.txt"; // "https://zsofiav1.github.io/projects/lettershape/data/wordlist_no_repeat.txt";
+// const WORDLIST_PATH_OR_URL: &str = "https://zsofiav1.github.io/projects/lettershape/data/wordlist_no_repeat.txt";
 #[wasm_bindgen]
 pub fn delim() -> char { DELIM_CHAR }
 const DELIM_CHAR: char = ';';
@@ -221,15 +221,15 @@ fn get_valid_words(words: &Vec<String>, valid_permutations: &Vec<String>) -> Vec
     // hash valid permutations
     // ---------------------------------------------------------------------------------------------
     let valid_permutations_hash: HashSet<u16> = valid_permutations
-        .iter()
-        .map(|perm| {
-            perm
-            .as_bytes()
-            .windows(2)
-            .map(|p| { two_character_hash(&p) })
-            .fold(0, |_, hash| hash)
-        })
-        .collect();
+    .iter()
+    .map(|perm| {
+        perm
+        .as_bytes()
+        .windows(2)
+        .map(|p| { two_character_hash(&p) })
+        .fold(0, |_, hash| hash)
+    })
+    .collect();
     // ---------------------------------------------------------------------------------------------
     // collect valid word indicies by matching them with the valid two-character permutations
     // ---------------------------------------------------------------------------------------------
@@ -258,10 +258,10 @@ fn get_valid_words(words: &Vec<String>, valid_permutations: &Vec<String>) -> Vec
     // clone the words from the indicies and return
     // ---------------------------------------------------------------------------------------------
     valid_words_idx
-        .iter()
-        .map(|&idx| &words[idx])
-        .cloned()
-        .collect()
+    .iter()
+    .map(|&idx| &words[idx])
+    .cloned()
+    .collect()
 }
 
 /// Returns a vector of valid permutations of the given letters for Letterbox
@@ -279,15 +279,21 @@ fn get_valid_permutations(letters: &Vec<Vec<char>>) -> Vec<String>{
     // ASSUMPTION:
     // - all characters within `letters` are UNIQUE
     // ---------------------------------------------------------------------------------------------
-    let mut permutations : Vec<String> = Vec::new();
+    let mut permutations: Vec<String> = Vec::new();
     for side in letters {
         for other_side in letters {
             if side[0] == other_side[0] { continue }
-            for sl in side {
-                for osl in other_side {
-                    permutations.push(format!("{}{}", sl, osl));
-                }
-            }
+            permutations
+            .extend(
+                side
+                .iter()
+                .map(|&c| 
+                    other_side
+                    .iter()
+                    .map(|&oc| format!("{}{}", c, oc))
+                    .collect::<Vec<String>>())
+                .flatten()
+            );
         }
     }
     permutations
@@ -320,13 +326,11 @@ fn two_character_hash(slice: &[u8]) -> u16 {
 /// 
 /// A vector containing all characters from the input array, in flattened order and converted to uppercase.
 fn flatten_and_uppercase(letters: &Vec<Vec<char>>) -> Vec<char> {
-    let mut result: Vec<char> = Vec::new();
-    for side in letters {
-        for letter in side {
-            result.push(letter.to_ascii_uppercase());
-        }
-    }
-    result
+    letters
+    .iter()
+    .flatten()
+    .map(|&c| c.to_ascii_uppercase())
+    .collect()
 }
 
 /// Splits a string into multiple substrings using a specified delimiter.
@@ -340,9 +344,10 @@ fn flatten_and_uppercase(letters: &Vec<Vec<char>>) -> Vec<char> {
 ///
 /// A vector of vector of characters containing the substrings.
 fn split_using_delimiter(s: &str, delimiter: char) -> Vec<Vec<char>> {
-    s.split(delimiter)
-        .map(|s| s.chars().collect())
-        .collect()
+    s
+    .split(delimiter)
+    .map(|s| s.chars().collect())
+    .collect()
 }
 
 /// Reads words from a given URL asynchronously.
@@ -356,13 +361,13 @@ fn split_using_delimiter(s: &str, delimiter: char) -> Vec<Vec<char>> {
 /// Returns a `Result` containing a vector of strings if successful, or a `JsValue` if an error occurs.
 async fn read_words_from_request(url: &str) -> Result<Vec<String>, JsValue> {
     let response = Request::get(url)
-        .send()
-        .await
-        .map_err(|_| JsValue::from_str("Failed to fetch file"))?;
+    .send()
+    .await
+    .map_err(|_| JsValue::from_str("Failed to fetch file"))?;
     let text = response
-        .text()
-        .await
-        .map_err(|_| JsValue::from_str("Failed to read response text"))?;
+    .text()
+    .await
+    .map_err(|_| JsValue::from_str("Failed to read response text"))?;
     let words = text.lines().map(str::to_owned).collect::<Vec<String>>();
     Ok(words)
 }

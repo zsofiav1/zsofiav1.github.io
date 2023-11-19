@@ -338,6 +338,7 @@ function drawPolygon() {
                 }
             });
         });
+        
         /**
          * Calculates the positions of input points between two given points.
          * @param {Object} pointA - The starting point.

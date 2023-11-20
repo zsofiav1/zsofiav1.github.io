@@ -4,18 +4,28 @@
 
 1. `cargo new <NAME> --lib`
 2. add the following to `Cargo.toml` (or respective versions of the libs):
-```
+```toml
+    # ...
+
     [lib]
     crate-type = ["cdylib"]
 
     [dependencies]
-    js-sys = "0.3.65"
     wasm-bindgen = "0.2"
+
+    # helpful (but not necessary) dependencies
+    js-sys = "0.3.65" # JS interface
+    reqwasm = "0.2" # requests: paired with futures
+    wasm-bindgen-futures = "0.4.38" # futures / async / await
+    web-sys = { version = "0.3", features = ['console'] } # console logging
+
+    [dev-dependencies]
+    wasm-bindgen-test = "0.2"
 ```
 3. `cargo build`
 4. `wasm-pack build --release --target web --no-typescript --out-dir <OUT_DIR>`
 5. In your `.js` file, this is how to initialize and use:
-```
+```javascript
 import init, { <RUST_WASM_FUNCTIONS_AND_STRUCTS> }  from './pkg/<PROJECT>.js';
 
 async function init() {

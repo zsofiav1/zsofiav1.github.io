@@ -10,8 +10,8 @@ use std::collections::HashSet;
 // ---------------------------------------------------------------------------------------------
 // constants
 // ---------------------------------------------------------------------------------------------
-const WORDLIST_PATH_OR_URL: &str = "../data/wordlist_no_repeat.txt"; // "https://zsofiav1.github.io/projects/lettershape/data/wordlist_no_repeat.txt";
-// const WORDLIST_PATH_OR_URL: &str = "https://zsofiav1.github.io/projects/lettershape/data/wordlist_no_repeat.txt";
+// const WORDLIST_PATH_OR_URL: &str = "./data/wordlist_no_repeat.txt"; // "https://zsofiav1.github.io/projects/lettershape/data/wordlist_no_repeat.txt";
+const WORDLIST_PATH_OR_URL: &str = "https://zsofiav1.github.io/projects/lettershape/data/wordlist_no_repeat.txt";
 #[wasm_bindgen]
 pub fn delim() -> char { DELIM_CHAR }
 const DELIM_CHAR: char = ';';

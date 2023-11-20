@@ -3,25 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Shape Creator</title>
-    <!-- <link rel="stylesheet" type="text/css" href="style.css?v=1.1"> -->
+    <title>Letterbox solver</title>
+    <link rel="stylesheet" type="text/css" href="style.css?v=p">
 </head>
 <body>
-    <label for="sides-slider">Number of Sides:</label>
-    <input type="range" id="sides-slider" min="3" max="10" value="4" step="1">
-    <label for="inputs-slider">Number of Inputs:</label>
-    <input type="range" id="inputs-slider" min="1" max="10" value="3" step="1">
-    <button id="run-button">Run</button>
-    <div id="output"></div>
-    <div class="polygon"
-            id="polygon"
-            data-num-inputs="3"
-            data-sides="4"
-            data-radius="40"
-            data-border-thickness="0.5"
-            data-body-color="lightblue"
-            data-border-color="blue">
+    <h1>Letterbox solver</h1>
+    <div class="omega">
+        <div class="main-content">
+            <div id="game-container">
+                <label for="sides-slider">Number of Sides:</label>
+                <input class="slider" type="range" id="sides-slider" min="3" max="10" value="4" step="1">
+                <br>
+                <label for="inputs-slider">Number of Inputs:</label>
+                <input class="slider" type="range" id="inputs-slider" min="1" max="10" value="3" step="1">
+                <br>
+                <div class="button-container">
+                    <button id="random-button">Fill randomly</button>
+                    <button id="run-button">Solve!</button>
+                </div>
+                <div class="polygon"
+                    id="polygon"
+                    data-num-inputs="3"
+                    data-sides="4"
+                    data-radius="60"
+                    data-border-thickness="2.5"
+                    data-body-color="#b3b3b3"
+                    data-border-color="#000000"
+                    >
+                </div>
+            </div>
+        </div> 
+        <div class="sidebar" id="output-container">
+            <h2>Output</h2>
+            <div id="output"></div>
+        </div>
     </div>
-    <script type="module" src="./script.js?v=1.5"></script>
+    <script type="module" src="./script.js?v=a"></script>
 </body>
 </html>

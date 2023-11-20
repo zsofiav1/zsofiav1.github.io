@@ -1,0 +1,143 @@
+:root {
+    --background-color: rgb(136, 211, 129);
+    --button-color: rgb(111, 190, 104);
+    --button-hover-color: rgb(75, 128, 70);
+    --text-color: rgb(53, 92, 50);
+}
+body {
+    background-color: var(--background-color);
+}
+
+h1, h2, p {
+    position: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    /* font-size: 3em; */
+    margin: 0;
+    padding: 0;
+    color: var(--text-color);
+    font-weight: bold;
+}
+
+.omega {
+    display: flex; /* Use Flexbox for layout */
+    justify-content: center; /* Center the content horizontally */
+    align-items: flex-start; /* Align items from the start vertically */
+    height: 100vh; /* Optional: Full viewport height */
+}
+
+.sidebar {
+    width: 30%;
+}
+
+.main-content {
+    overflow: hidden;
+    width: 60%;
+}
+
+#game-container {
+    width: 80%;
+    margin: auto;
+    border-radius: 25px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: 'Roboto', sans-serif;
+}
+.polygon {
+    margin: auto;
+    width: 100%;
+    height: 100%;
+    /* max-width: 500px;
+    max-height: 500px;
+    min-width: 300px;
+    min-height: 300px; */
+    padding: 10px;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+}
+
+.button-container #run-button {
+    /* static width */
+    width: 40%;
+}
+.button-container #random-button {
+    /* static width */
+    width: 40%;
+}
+
+.button-container button {
+    color: white;
+    background-color: var(--button-color);
+    border: saddlebrown;
+    border-radius: 5px;
+    padding: 10px 20px;
+    margin: 5px;
+    font-size: 16px;
+    transition: background-color 1s;
+}
+
+.button-container button:hover {
+    background-color: var(--button-hover-color);
+    /* font-weight: bold; */
+    text-shadow: 
+        0.5px 0 0 currentColor,
+       -0.5px 0 0 currentColor,
+        0 0.5px 0 currentColor,
+        0 -0.5px 0 currentColor;
+}
+
+.button-container button:active {
+    background-color: var(--button-color)
+}
+.button-container {
+    transition: text-shadow 2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* General Styles for Slider */
+.slider {
+    -webkit-appearance: none;  /* Removes default webkit styles */
+    appearance: none;
+    width: 100%; /* Full-width */
+    height: 25px; /* Specified height */
+    background: transparent; /* Make the slider background transparent */
+  }
+  
+  /* Styling for Slider Track */
+  .slider::-webkit-slider-runnable-track {
+    width: 100%;
+    background: linear-gradient(to right, var(--button-color), var(--button-hover-color), var(--text-color)); /* Gradient */
+    border-radius: 5px;
+  }
+  
+  .slider::-moz-range-track {
+    width: 100%;
+    background: linear-gradient(to right, var(--button-color), var(--button-hover-color), var(--text-color)); /* Gradient */
+    border-radius: 5px;
+  }
+  
+  /* Styling for Slider Thumb */
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px; /* Width and height of the slider thumb */
+    height: 25px;
+    background: rgb(168, 94, 10); /* Slider thumb background color */
+    cursor: pointer; /* Cursor on hover */
+    border-radius: 50%; /* Circular shape */
+    /* border: 2px solid rgb(136, 10, 168); */
+  }
+  
+  .slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    background: #fff;
+    cursor: pointer;
+    border-radius: 50%;
+    border: 1px solid gray;
+  }
+  

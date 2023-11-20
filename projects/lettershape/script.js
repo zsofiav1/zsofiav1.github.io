@@ -8,13 +8,12 @@ import init, { LetterShape, delim }  from './pkg/lettershape.js';
 // ---------------------------------------------------------------------------------------------
 const POLYGON_MIN_SIDES = 3;
 const POLYGON_MAX_SIDES = 13;
-const CIRCLE_RADIUS = 10;
+const CIRCLE_RADIUS = 3.5;
 const SLIDER_MAX_WIDTH_PX = 300;
 const INPUT_ERROR_COLOR = '#ffb3b3';
 const INPUT_VALID_COLOR = () => document.getElementById('polygon').dataset.bodyColor || 'white';
-const INPUT_SIZE_PERCENT = 1 / 250;
-// const INPUT_SIZE_MAX_PX = 5;
-// const INPUT_SIZE_PX = () => (window.innerWidth * INPUT_SIZE_PERCENT) > INPUT_SIZE_MAX_PX ? INPUT_SIZE_MAX_PX : window.innerWidth * INPUT_SIZE_PERCENT;
+const INPUT_SIZE_PERCENT = 1 / 50;
+const INPUT_SIZE_MAX_PX = 100;
 const INPUT_SIZE_PX = () => window.innerWidth * INPUT_SIZE_PERCENT;
 
 // ---------------------------------------------------------------------------------------------
@@ -95,7 +94,7 @@ async function _solve(letters, callback) {
 // ---------------------------------------------------------------------------------------------
 // solves the lettershape puzzle
 // ---------------------------------------------------------------------------------------------
-function solve() {
+async function solve() {
     const inputs = document.querySelectorAll('.polygon-input');
     const letters = [];
     let allLettersPresent = true;
@@ -117,9 +116,16 @@ function solve() {
     output.innerHTML = '';
     let img = document.createElement('img');
     img.src = `${window.location.origin}/media/loading.gif`;
+    // img.src = `https://zsofiav1.github.io/media/loading.gif`;
+    // center the image within the output div
+    img.style.position = 'absolute';
+    img.style.left = '50%';
+    img.style.top = '50%';
+    img.style.transform = 'translate(-50%, -50%)';
     output.appendChild(img);
+    // wait for the image to load (blocking)
+    await new Promise(resolve => img.onload = resolve);
     drawPolygon();
-    // await new Promise(r => setTimeout(r, 100));
     // ---------------------------------------------------------------------------------------------
     // solve for solutions and create a callback
     // ---------------------------------------------------------------------------------------------
@@ -236,8 +242,9 @@ function drawPolygon() {
     // ---------------------------------------------------------------------------------------------
         const sides = parseInt(polygon.dataset.sides, 10);
         const radius = polygon.dataset.radius || DEFAULT__POLYGON_RADIUS;
-        const parentWidth = polygon.getBoundingClientRect().width;
-        const points = createRegularPolygonPoints(sides, radius, parentWidth / 2, parentWidth / 2);
+        // const parentWidth = polygon.getBoundingClientRect().width;
+        // const points = createRegularPolygonPoints(sides, radius, parentWidth / 2, parentWidth / 2);
+        const points = createRegularPolygonPoints(sides, radius, 100, 100);
         // const points = createRegularPolygonPoints(sides, radius);
     // ---------------------------------------------------------------------------------------------
     // if any subelements of polygon exist (e.g. svg, circle, polygon, input), remove it
@@ -255,7 +262,8 @@ function drawPolygon() {
         const svgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svgElement.setAttribute('width', '100%');
         svgElement.setAttribute('height', '100%');
-        svgElement.setAttribute('viewBox', `0 0 ${parentWidth} ${parentWidth}`);
+        // svgElement.setAttribute('viewBox', `0 0 ${parentWidth} ${parentWidth}`);
+        svgElement.setAttribute('viewBox', `0 0 200 200`);
         const polygonElement = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
         polygonElement.setAttribute('fill', polygon.dataset.bodyColor || DEFAULT__POLYGON_BODY_COLOR);
         polygonElement.setAttribute('stroke', polygon.dataset.borderColor || DEFAULT__POLYGON_BORDER_COLOR);
@@ -299,6 +307,7 @@ function drawPolygon() {
         const sideLength = Math.sqrt(Math.pow(polygonPointsArray[0].x - polygonPointsArray[1].x, 2) + Math.pow(polygonPointsArray[0].y - polygonPointsArray[1].y, 2));
         const numInputsPerSide = parseInt(polygon.dataset.numInputs) || DEFAULT__NUM_INPUTS_PER_SIDE;
         let input_size_px = INPUT_SIZE_PX() * sideLength / (20 * numInputsPerSide);
+        if (input_size_px > INPUT_SIZE_MAX_PX) input_size_px = INPUT_SIZE_MAX_PX;
         const inputs = []; // Array to hold references to all input elements
         let letterBufferIndex = 0;
         polygonPointsArray.forEach(function(point) {

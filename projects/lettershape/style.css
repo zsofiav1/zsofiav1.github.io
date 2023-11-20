@@ -8,7 +8,7 @@ body {
     background-color: var(--background-color);
 }
 
-h1, h2 {
+h1, h2, p {
     position: flex;
     justify-content: center;
     align-items: center;

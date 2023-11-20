@@ -8,14 +8,17 @@ import init, { LetterShape, delim }  from './pkg/lettershape.js';
 // ---------------------------------------------------------------------------------------------
 const POLYGON_MIN_SIDES = 3;
 const POLYGON_MAX_SIDES = 13;
-const CIRCLE_RADIUS = 2;
-const INPUT_SIZE_PX = 20;
-const INPUT_ERROR_COLOR = '#ffb3b3';
-const INPUT_VALID_COLOR = 'white';
+const CIRCLE_RADIUS = 10;
 const SLIDER_MAX_WIDTH_PX = 300;
+const INPUT_ERROR_COLOR = '#ffb3b3';
+const INPUT_VALID_COLOR = () => document.getElementById('polygon').dataset.bodyColor || 'white';
+const INPUT_SIZE_PERCENT = 1 / 250;
+// const INPUT_SIZE_MAX_PX = 5;
+// const INPUT_SIZE_PX = () => (window.innerWidth * INPUT_SIZE_PERCENT) > INPUT_SIZE_MAX_PX ? INPUT_SIZE_MAX_PX : window.innerWidth * INPUT_SIZE_PERCENT;
+const INPUT_SIZE_PX = () => window.innerWidth * INPUT_SIZE_PERCENT;
 
 // ---------------------------------------------------------------------------------------------
-// default values
+// default values (change in html)
 // ---------------------------------------------------------------------------------------------
 const DEFAULT__NUM_INPUTS_PER_SIDE = 2;
 const DEFAULT__POLYGON_RADIUS = 40;
@@ -39,6 +42,13 @@ document.addEventListener('DOMContentLoaded', init_wasm);
 document.addEventListener('DOMContentLoaded', loadSequence);
 document.getElementById('polygon').addEventListener('input', drawPolygon);
 document.getElementById('run-button').addEventListener('click', solve);
+document.getElementById('random-button').addEventListener('click', prefillRandom);
+// when an input is clicked, select the text
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('polygon-input')) {
+        e.target.select();
+    }
+});
 document.getElementById('sides-slider').addEventListener('input', function() {
     setSidesRange();
     setInputMax();
@@ -59,7 +69,7 @@ window.addEventListener('resize', function() {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function() {
         drawPolygon();
-    }, 10);
+    }, 15);
 });
 
 // ---------------------------------------------------------------------------------------------
@@ -71,10 +81,21 @@ async function init_wasm() {
     letterShapeObj = await LetterShape.new();
 }
 
+/**
+ * Solves the letter shape problem for the given letters.
+ * @param {string[]} letters - The letters to be solved.
+ * @param {function} callback - The callback function to be called with the solutions.
+ * @returns {Promise<void>}
+ */
+async function _solve(letters, callback) {
+    let solutions = await letterShapeObj.solve(letters);
+    callback(solutions);
+}
+
 // ---------------------------------------------------------------------------------------------
 // solves the lettershape puzzle
 // ---------------------------------------------------------------------------------------------
-async function solve() {
+function solve() {
     const inputs = document.querySelectorAll('.polygon-input');
     const letters = [];
     let allLettersPresent = true;
@@ -98,21 +119,53 @@ async function solve() {
     img.src = `${window.location.origin}/media/loading.gif`;
     output.appendChild(img);
     drawPolygon();
-    await new Promise(r => setTimeout(r, 100));
+    // await new Promise(r => setTimeout(r, 100));
     // ---------------------------------------------------------------------------------------------
-    // solve for solutions
+    // solve for solutions and create a callback
     // ---------------------------------------------------------------------------------------------
-    let solutions = await letterShapeObj.solve(formattedLetters);
+    _solve(formattedLetters, (solutions) => {
     // ---------------------------------------------------------------------------------------------
-    // display the solutions and redraw the polygon
+    // display the solutions into a table and redraw the polygon
     // ---------------------------------------------------------------------------------------------
-    output.innerHTML = '';
-    let p = document.createElement('p');
-    p.innerHTML = solutions;
-    output.appendChild(p);
-    drawPolygon();
+        if (solutions === '' || solutions === '[]') {
+            output.innerHTML = 'No solutions found';
+            drawPolygon();
+            return;
+        }
+        output.innerHTML = '';
+        let table = document.createElement('table');
+        let thead = document.createElement('thead');
+        let parsedSolutions = solutions.split('),');
+        parsedSolutions = parsedSolutions.map(function(solution, solutionIndex) {
+            if (solutionIndex === 0) solution = solution.replace(/\[/g, '');
+            solution = solution.replace(/\(/g, '');
+            solution = solution.replace(/"/g, '');
+            if (solutionIndex === parsedSolutions.length - 1) {
+                solution = solution.replace(/\)/g, '');
+                solution = solution.replace(/\]/g, '');
+            }
+            return solution;
+        });
+        parsedSolutions = parsedSolutions.map(function(solution) {
+            solution = solution.split(',');
+            solution = solution.map(function(word) { return word.trim(); });
+            solution = solution.join(' ');
+            return solution;
+        });
+        parsedSolutions.forEach(function(solution) {
+            let row = document.createElement('tr');
+            solution.split(' ').forEach(function(word) {
+                let cell = document.createElement('td');
+                cell.innerHTML = word;
+                row.appendChild(cell);
+            });
+            thead.appendChild(row);
+        });
+        table.appendChild(thead);
+        output.appendChild(table);
+        drawPolygon();
+    });
 }
-
 
 // ---------------------------------------------------------------------------------------------
 // load sequence
@@ -154,6 +207,22 @@ function formatLetters(letters) {
 }
 
 /**
+ * Fills the lettersBuffer array with random letters based on the number of inputs and sides.
+ */
+function prefillRandom() {
+    const numInputs = parseInt(document.getElementById('inputs-slider').value);
+    const numSides = parseInt(document.getElementById('sides-slider').value);
+    const numLetters = (numInputs * numSides) > 26 ? 26 : numInputs * numSides;
+    let letters = [];
+    while (letters.length < numLetters) {
+        let letter = Math.floor(Math.random() * 26) + 65;
+        if (!letters.includes(letter)) letters.push(letter);
+    }
+    lettersBuffer = letters.map(letter => String.fromCharCode(letter));
+    drawPolygon();
+}
+
+/**
  * Draws a polygon element with specified sides and radius.
  */
 function drawPolygon() {
@@ -167,7 +236,9 @@ function drawPolygon() {
     // ---------------------------------------------------------------------------------------------
         const sides = parseInt(polygon.dataset.sides, 10);
         const radius = polygon.dataset.radius || DEFAULT__POLYGON_RADIUS;
-        const points = createRegularPolygonPoints(sides, radius);
+        const parentWidth = polygon.getBoundingClientRect().width;
+        const points = createRegularPolygonPoints(sides, radius, parentWidth / 2, parentWidth / 2);
+        // const points = createRegularPolygonPoints(sides, radius);
     // ---------------------------------------------------------------------------------------------
     // if any subelements of polygon exist (e.g. svg, circle, polygon, input), remove it
     // ---------------------------------------------------------------------------------------------
@@ -184,7 +255,7 @@ function drawPolygon() {
         const svgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svgElement.setAttribute('width', '100%');
         svgElement.setAttribute('height', '100%');
-        svgElement.setAttribute('viewBox', '0 0 200 200');
+        svgElement.setAttribute('viewBox', `0 0 ${parentWidth} ${parentWidth}`);
         const polygonElement = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
         polygonElement.setAttribute('fill', polygon.dataset.bodyColor || DEFAULT__POLYGON_BODY_COLOR);
         polygonElement.setAttribute('stroke', polygon.dataset.borderColor || DEFAULT__POLYGON_BORDER_COLOR);
@@ -225,27 +296,33 @@ function drawPolygon() {
         const svgHeight = svgRect.height;
         const scaleX = svgWidth / viewBoxWidth;
         const scaleY = svgHeight / viewBoxHeight;
-        const inputs = []; // Array to hold references to all input elements
+        const sideLength = Math.sqrt(Math.pow(polygonPointsArray[0].x - polygonPointsArray[1].x, 2) + Math.pow(polygonPointsArray[0].y - polygonPointsArray[1].y, 2));
         const numInputsPerSide = parseInt(polygon.dataset.numInputs) || DEFAULT__NUM_INPUTS_PER_SIDE;
+        let input_size_px = INPUT_SIZE_PX() * sideLength / (20 * numInputsPerSide);
+        const inputs = []; // Array to hold references to all input elements
         let letterBufferIndex = 0;
         polygonPointsArray.forEach(function(point) {
             let otherPointIndex = (point === polygonPointsArray[polygonPointsArray.length - 1]) ? 0 : polygonPointsArray.indexOf(point) + 1;
             let otherPoint = polygonPointsArray[otherPointIndex];
-            let inputPositions = getInputPositions(point, otherPoint);
-            inputPositions.forEach(function(inputPosition, index) {
+            getInputPositions(point, otherPoint, input_size_px).forEach(function(inputPosition) {
                 let input = document.createElement('input');
                 input.setAttribute('type', 'text');
-                input.setAttribute('value', lettersBuffer[letterBufferIndex]);
+                input.setAttribute('value', lettersBuffer[letterBufferIndex] || '');
                 letterBufferIndex++;
                 input.setAttribute('maxlength', '1');
                 input.classList.add('polygon-input');
                 input.style.position = 'absolute';
                 input.style.left = `${inputPosition.x}px`;
                 input.style.top = `${inputPosition.y}px`;
-                input.style.transform = 'translate(-25%, -25%)';
-                input.style.width = `${INPUT_SIZE_PX}px`;
-                input.style.height = `${INPUT_SIZE_PX}px`;
+                input.style.transform = 'translate(-15%, -15%)';
+                input.style.width = `${input_size_px}px`;
+                input.style.height = `${input_size_px}px`;
+                input.style.fontSize = `${input_size_px * 0.75}px`;
                 input.style.textAlign = 'center';
+                input.style.color = window.getComputedStyle(document.querySelector('h1')).color;
+                input.style.fontWeight = 'bold';
+                input.style.fontFamily = window.getComputedStyle(document.querySelector('h1')).fontFamily;
+                input.style.backgroundColor = INPUT_VALID_COLOR();
                 inputs.push(input);
                 document.body.appendChild(input);
             });
@@ -262,7 +339,7 @@ function drawPolygon() {
                 if (e.keyCode === 8) {
                     deleteKeyPressed = true;
                     input.value = '';
-                    input.style.backgroundColor = INPUT_VALID_COLOR;
+                    input.style.backgroundColor = INPUT_VALID_COLOR();
                     if (index > 0) {
                         inputs[index - 1].focus();
                         inputs[index - 1].select();
@@ -286,7 +363,7 @@ function drawPolygon() {
             input.addEventListener('input', function() {
                 let value = input.value;
                 if (value === '' && !deleteKeyPressed) {
-                    input.style.backgroundColor = INPUT_VALID_COLOR;
+                    input.style.backgroundColor = INPUT_VALID_COLOR();
                     if (index > 0) {
                         inputs[index - 1].focus();
                         inputs[index - 1].select();
@@ -306,7 +383,7 @@ function drawPolygon() {
                     // display an error message point at the input saying only letters are allowed
                     // this.setCustomValidity('Only letters are allowed');
                     return;
-                } else input.style.backgroundColor = INPUT_VALID_COLOR;
+                } else input.style.backgroundColor = INPUT_VALID_COLOR();
     // ---------------------------------------------------------------------------------------------
     // check if the letter appears more than once
     // ---------------------------------------------------------------------------------------------
@@ -345,11 +422,11 @@ function drawPolygon() {
          * @param {Object} pointB - The ending point.
          * @returns {Array} - An array of input positions.
          */
-        function getInputPositions(pointA, pointB) {
-            let AinputX = (pointA.x * scaleX) + svgRect.left - (INPUT_SIZE_PX / 2);
-            let AinputY = (pointA.y * scaleY) + svgRect.top - (INPUT_SIZE_PX / 2);
-            let BinputX = (pointB.x * scaleX) + svgRect.left - (INPUT_SIZE_PX / 2);
-            let BinputY = (pointB.y * scaleY) + svgRect.top - (INPUT_SIZE_PX / 2);
+        function getInputPositions(pointA, pointB, input_size_px) {
+            let AinputX = (pointA.x * scaleX) + svgRect.left - (input_size_px / 2);
+            let AinputY = (pointA.y * scaleY) + svgRect.top - (input_size_px / 2);
+            let BinputX = (pointB.x * scaleX) + svgRect.left - (input_size_px / 2);
+            let BinputY = (pointB.y * scaleY) + svgRect.top - (input_size_px / 2);
             let inputPositions = [];
             const inputXStep = (BinputX - AinputX) / (numInputsPerSide + 1);
             const inputYStep = (BinputY - AinputY) / (numInputsPerSide + 1);
@@ -401,13 +478,13 @@ function scaleSliderAccordingToValue() {
  * @param {number} radius - The radius of the polygon.
  * @returns {string} - The points of the polygon as a string.
  */
-function createRegularPolygonPoints(sides, radius) {
+function createRegularPolygonPoints(sides, radius, center_x, center_y) {
     const offset = Math.PI / 4; // Set offset to 45 degrees to start at top right
     const step = 2 * Math.PI / sides; // Angle between vertices
     let points = [];
     for (let i = 0; i < sides; i++) {
-        const x = 50 + radius * Math.cos(step * i - offset);
-        const y = 50 + radius * Math.sin(step * i - offset);
+        const x = center_x + radius * Math.cos(step * i - offset);
+        const y = center_y + radius * Math.sin(step * i - offset);
         points.push(`${x},${y}`);
     }
     return points.join(' ');

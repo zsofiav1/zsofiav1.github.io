@@ -9,24 +9,22 @@ const COLS: usize = 100;
 
 fn main() {
 
+    let img_paths = vec![
+        "tesselation/diags.png",
+        "tesselation/hourglass.png",
+        "tesselation/qt_lines.png",
+        "tesselation/qt_solid.png",
+        "tesselation/sq_lines.png",
+        "tesselation/sq_solid.png",
+    ];
 
-    let img_paths = 
-    vec!["tesselation/diags.png",
-    "tesselation/hourglass.png",
-    "tesselation/qt_lines.png",
-    "tesselation/qt_solid.png",
-    "tesselation/sq_lines.png",
-    "tesselation/sq_solid.png"];
-
-    let colors:Vec<Rgba<u8>> = vec![
+    let colors: Vec<Rgba<u8>> = vec![
         Rgba([0, 67, 86, 255]),
         Rgba([214, 40, 40, 255]),
         Rgba([247, 127, 0, 255]),
         Rgba([252, 191, 73, 255])
     ];
     let bg_color = Rgba([243, 238, 208, 255]); // #f3eed0
-
-
 
     // load images
     let mut imgs = Vec::new();
@@ -56,13 +54,8 @@ fn main() {
     //zip the randomlist, randomcol and randomrot together
     let randomlist = randomlist.iter().zip(randomcol.iter()).zip(randomrot.iter()).map(|((a,b),c)| (*a,*b,*c)).collect::<Vec<_>>();
 
-
-
     //initialize color&rotation lookup table
     let mut lookup_table: HashMap<Rgba<u8>, HashMap<usize, Vec<DynamicImage>>> = HashMap::new();
-
-
-
 
     //loop through all the colors
     for color in &colors{

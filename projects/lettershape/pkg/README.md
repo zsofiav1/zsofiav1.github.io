@@ -1,9 +1,16 @@
 # LetterShape
 
-## to build, run in current directory
-- `bash build.bat`
+## Building
 
-if it does not run (probably on windows), then just run the commands in the file manually
+Must be in `lettershape` directory
 
-## to view, must be in home directy and run
+### Linux
+`bash build.sh`
+
+### Windows
+`.\build.bat`
+
+## To view on browser
+
+Must be in parent directory (or where ever an `index.html` / JavaScript script binds the WASM)
 - `python -m http.server`

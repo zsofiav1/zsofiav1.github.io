@@ -4,19 +4,20 @@ use std::{path::Path, collections::HashMap};
 
 const IMAGE_SIZE: u32 = 50;
 const NON_ROTATED_INDEX: usize = 5;
-const ROWS: usize = 100;
-const COLS: usize = 100;
+const ROWS: usize = 20;
+const COLS: usize = 20;
+
+// image directory: current file directory + "tesselation"
+const IMAGE_DIRECTORY: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tesselation/");
 
 fn main() {
 
-    let img_paths = vec![
-        "tesselation/diags.png",
-        "tesselation/hourglass.png",
-        "tesselation/qt_lines.png",
-        "tesselation/qt_solid.png",
-        "tesselation/sq_lines.png",
-        "tesselation/sq_solid.png",
-    ];
+    // get all images in the image directory
+    let mut img_paths = std::fs::read_dir(IMAGE_DIRECTORY).unwrap().map(|x| x.unwrap().path()).collect::<Vec<_>>();
+    // remove all directories
+    img_paths.retain(|x| x.is_file());
+    // print
+    println!("Found {} images", img_paths.len());
 
     let colors: Vec<Rgba<u8>> = vec![
         Rgba([0, 67, 86, 255]),
@@ -38,7 +39,7 @@ fn main() {
     let mut rng = rand::thread_rng();
 
 
-    let weights = [0.2, 0.2, 0.2, 0.2, 0.1, 0.1];
+    let weights = [0.1, 0.1, 0.2, 0.5, 0.1, 0.1, 0.2, 0.05,0.05];
     let dist = WeightedIndex::new(&weights).unwrap();
     let randomlist: Vec<usize> = (0..ROWS*COLS).map(|_| dist.sample(&mut rng)).collect();
 

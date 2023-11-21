@@ -26,7 +26,8 @@
 4. `wasm-pack build --release --target web --no-typescript --out-dir <OUT_DIR>`
 5. In your `.js` file, this is how to initialize and use:
 ```javascript
-import init, { <RUST_WASM_FUNCTIONS_AND_STRUCTS> }  from './pkg/<PROJECT>.js';
+import init, { <RUST_WASM_FUNCTIONS_AND_STRUCTS> } from './pkg/<PROJECT>.js';
+// this path is relative to the .js file                 ^^^^^^^^^^^^^^^^^^^
 
 async function init() {
     await init('./pkg/<PROJECT>_bg.wasm');

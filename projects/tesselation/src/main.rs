@@ -5,7 +5,7 @@ use std::{path::Path, collections::HashMap};
 const IMAGE_SIZE: u32 = 50;
 const NON_ROTATED_INDEX: usize = 5;
 const ROWS: usize = 20;
-const COLS: usize = 20;
+const COLS: usize = 100;
 
 // image directory: current file directory + "tesselation"
 const IMAGE_DIRECTORY: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tesselation/");

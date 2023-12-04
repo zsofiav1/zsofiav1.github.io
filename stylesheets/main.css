@@ -1,17 +1,24 @@
+/* colors: 004356,d62828,f77f00,fcbf49,f3eed0 */
 body {
     font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f7f9fc;
-    color: #333;
+    background-color: #f3eed0;
+    color: #004356;
+    font-family:testing;
+
 }
 
 header {
-    background-color: #2c3e50;
-    color: #ecf0f1;
+    /* background-color: #2c3e50; */
+    background-image: url('tessellation.png');
+    color: #004356;
+    background-size: 3450px;
     padding: 20px 0;
     text-align: center;
+    font-family:testing;
 }
+
 
 section {
     padding: 40px;
@@ -22,7 +29,7 @@ h1, h2, h3 {
 }
 
 a {
-    color: #2980b9;
+    color: #f77f00;
     text-decoration: none;
 }
 
@@ -33,10 +40,13 @@ a:hover {
 .container {
     max-width: 800px;
     margin: auto;
+    background-color: rgba(243, 238, 208, 0.8); 
+    padding: 10px; /* Add padding as needed */
+    border-radius: 5px;
 }
 
 .divider {
-    border-top: 1px solid #ecf0f1;
+    border-top: 1px solid #f3eed0;
     margin: 20px 0;
 }
 
@@ -45,8 +55,8 @@ a:hover {
 }
 
 footer {
-    background-color: #2c3e50;
-    color: #ecf0f1;
+    background-color: #004356;
+    color: #f3eed0;
     padding: 20px 0;
     text-align: center;
 }
@@ -63,3 +73,9 @@ footer {
     animation: fadeIn 2s ease-in-out forwards;
     opacity: 0; /* Initial state before the animation starts */
 }
+
+@font-face {
+    font-family: testing;
+    src: url(fonts/Neuesbauen.ttf);
+  }
+

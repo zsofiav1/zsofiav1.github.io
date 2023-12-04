@@ -2,121 +2,79 @@
 <!-- comment -->
 <html lang="en">
 <head>
-    <!-- <link rel="stylesheet" type="text/css" href="stylesheets/main.css"> -->
+    <link rel="stylesheet" type="text/css" href="stylesheets/main.css?v=1.1">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Name - Digital Resume</title>
+    <!-- <script src="https://cdn.jsdelivr.net/gh/impress/impress.js@2.0.0/js/impress.js"></script> -->
 </head>
-
 <body>
-    <div id="impress">
-        <!-- Base -->
-        <div id="home" class="step home" data-x="0" data-y="0" data-z="-100" data-rotate-y="0" data-rotate-z="0" data-rotate-order="yzx">
-            <script>
-                var divs = document.querySelectorAll("div#home");
-                for (var i = 0; i < divs.length; i++) {
-                    var div = divs[i];
-                    var rect = div.getBoundingClientRect();
-                    var x = rect.left;
-                    var y = rect.top;
-                    var width = rect.width;
-                    var height = rect.height;
-                    var radius = 10;
-                    var color = "red";
-                    var opacity = 1;
-                    var strokeWidth = 2;
-                    var strokeColor = "black";
-                    var strokeOpacity = 1;
-                    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-                    svg.setAttribute("width", width);
-                    svg.setAttribute("height", height);
-                    svg.setAttribute("style", "position: absolute; left: " + x + "px; top: " + y + "px;");
-                    var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                    circle.setAttribute("cx", radius);
-                    circle.setAttribute("cy", radius);
-                    circle.setAttribute("r", radius);
-                    circle.setAttribute("fill", color);
-                    circle.setAttribute("fill-opacity", opacity);
-                    circle.setAttribute("stroke", strokeColor);
-                    circle.setAttribute("stroke-opacity", strokeOpacity);
-                    circle.setAttribute("stroke-width", strokeWidth);
-                    circle.setAttribute("id", "home");
-                    svg.appendChild(circle);
-                    var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                    circle.setAttribute("cx", width - radius);
-                    circle.setAttribute("cy", radius);
-                    circle.setAttribute("r", radius);
-                    circle.setAttribute("fill", color);
-                    circle.setAttribute("fill-opacity", opacity);
-                    circle.setAttribute("stroke", strokeColor);
-                    circle.setAttribute("stroke-opacity", strokeOpacity);
-                    circle.setAttribute("stroke-width", strokeWidth);
-                    circle.setAttribute("id", "home");
-                    svg.appendChild(circle);
-                    var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                    circle.setAttribute("cx", radius);
-                    circle.setAttribute("cy", height - radius);
-                    circle.setAttribute("r", radius);
-                    circle.setAttribute("fill", color);
-                    circle.setAttribute("fill-opacity", opacity);
-                    circle.setAttribute("stroke", strokeColor);
-                    circle.setAttribute("stroke-opacity", strokeOpacity);
-                    circle.setAttribute("stroke-width", strokeWidth);
-                    circle.setAttribute("id", "home");
-                    svg.appendChild(circle);
-                    var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                    circle.setAttribute("cx", width - radius);
-                    circle.setAttribute("cy", height - radius);
-                    circle.setAttribute("r", radius);
-                    circle.setAttribute("fill", color);
-                    circle.setAttribute("fill-opacity", opacity);
-                    circle.setAttribute("stroke", strokeColor);
-                    circle.setAttribute("stroke-opacity", strokeOpacity);
-                    circle.setAttribute("stroke-width", strokeWidth);
-                    circle.setAttribute("id", "home");
-                    svg.appendChild(circle);
-                    div.appendChild(svg);
-                }
-            </script>
-            <div class="home">
-                <h1>Home</h1>
-                <h2>Hello impress presentation tool</h2>
-            </div>
+    <header>
+        <div class="container">
+            <h1>Your Name</h1>
+            <p>Web Developer | Designer | Your Specialty</p>
+            <nav>
+                <!-- Navigation links -->
+                <a href="#">Home</a>
+                <a href="pages/projects.html">Projects</a>
+                <a href="pages/cgol">CGOL</a>
+                <a href="projects/lettershape">LETTERSHAPE</a>
+                <!-- Add other links as necessary -->
+            </nav>
         </div>
+    </header>
 
-        <!-- <div id="side1" class="step side1" data-x="-94.28" data-y="0" data-z="33.33" data-rotate-y="-60" data-rotate-z="60" data-rotate-order="yzx"> -->
-        <div id="side1" class="step side1" data-x="0" data-y="0" data-z="100" data-rotate-y="-60" data-rotate-z="-15" data-rotate-order="zyx">
-            <div class="side1">
-                <h1>Side 1</h1>
-                <h2>Hello impress presentation tool</h2>
+    <section>
+        <div id="resume-content" class="container">
+            <h2>About Me</h2>
+            <p>
+                Write a brief paragraph about yourself, your background, and your achievements. 
+                This section is meant to give viewers a quick snapshot of who you are and what you bring to the table.
+            </p>
+
+            <div class="divider"></div>
+
+            <h2>Experience</h2>
+            
+            <div class="info-item">
+                <h3>Job Position - Company Name</h3>
+                <p>Date Started - Date Ended</p>
+                <p>
+                    A description of your role, responsibilities, and achievements at this position.
+                </p>
             </div>
+
+            <!-- Repeat the above structure for other experiences -->
+
+            <div class="divider"></div>
+
+            <h2>Education</h2>
+
+            <div class="info-item">
+                <h3>Degree - University/Institution Name</h3>
+                <p>Year Started - Year Graduated</p>
+                <p>
+                    A brief description or list of courses relevant to your profession.
+                </p>
+            </div>
+
+            <!-- Repeat the above structure for other educational qualifications -->
+
+            <div class="divider"></div>
+
+            <h2>Contact</h2>
+            <p>Email: zsofiav1 [ at ] gmail [ dot ] com</p>
+            <p>LinkedIn: <a href="https://linkedin.com/in/zsofiavoros">https://linkedin.com/in/zsofiavoros</a></p>
+            <p>GitHub: <a href="https://github.com/zsofiav1">https://github.com/zsofiav1</a></p>
+            <!-- Add other contact methods if necessary -->
+
         </div>
+    </section>
 
-        <!-- <div id="side2" class="step side2" data-x="47.14" data-y="-81.65" data-z="33.33" data-rotate-y="-60" data-rotate-z="70.53">
-            <div class="side2">
-                <h1>Side 2</h1>
-                <h2>Hello impress presentation tool</h2>
-            </div>
-        </div> -->
-
-        <!-- <div id="side3" class="step side3" data-x="47.14" data-y="81.65" data-z="94.28" data-rotate-y="60" data-rotate-z="70.53">
-            <div class="side3">
-                <h1>Side 3</h1>
-                <h2>Hello impress presentation tool</h2>
-            </div>
-        </div> -->
-    </div>
-
-    <button id="prev">Previous</button>
-    <button id="next">Next</button>
-
-    <script src="https://cdn.jsdelivr.net/gh/impress/impress.js@2.0.0/js/impress.js"></script>
-    <script>impress().init()</script>
-    <!-- <script>
-        // on DOM load, initialize impress.js
-        document.addEventListener("DOMContentLoaded", function() {
-            impress().init();
-        });
-    </script> -->
+    <footer>
+        <div>
+            <p>&copy; 2023 Your Name. All rights reserved.</p>
+        </div>
+    </footer>
 </body>
 </html>

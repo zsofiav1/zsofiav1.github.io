@@ -15,8 +15,8 @@ async function run() {
 
 const CELL_SIZE = 2; // pixels
 const GRID_COLOR = "#000000";
-const DEAD_COLOR = "#000000";
-const ALIVE_COLOR = "#FF0000";
+const DEAD_COLOR = "#004356";
+const ALIVE_COLOR = "#fcbf49";
 const WIDTH = 256;
 const HEIGHT = 256;
 

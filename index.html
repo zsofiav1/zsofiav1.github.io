@@ -5,24 +5,32 @@
     <link rel="stylesheet" type="text/css" href="stylesheets/main.css?v=1.1">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Name - Digital Resume</title>
+    <title>ZKV</title>
     <!-- <script src="https://cdn.jsdelivr.net/gh/impress/impress.js@2.0.0/js/impress.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
     <header>
-        <div class="container">
-            <h1>Your Name</h1>
-            <p>Web Developer | Designer | Your Specialty</p>
-            <nav>
-                <!-- Navigation links -->
-                <a href="#">Home</a>
-                <a href="pages/projects.html">Projects</a>
-                <a href="pages/cgol">CGOL</a>
-                <a href="projects/lettershape">LETTERSHAPE</a>
-                <!-- Add other links as necessary -->
-            </nav>
+        <div class="header_container">
+            <div id="octahedronCanvas"></div> <!-- Three.js canvas -->
+            <div class="header_content">
+
+                <h1>Zsofia Voros</h1>
+                <p>Data Analyst | Statistician | Data Engineer</p>
+                <nav>
+                    <!-- Navigation links -->
+                    <a href="#">Home</a>
+                    <a href="pages/projects.html">Projects</a>
+                    <a href="pages/cv.html">Curriculum Vitae</a>
+
+                    <!-- <a href="pages/cgol">CGOL</a>
+                    <a href="projects/lettershape">LETTERSHAPE</a> -->
+                    <!-- Add other links as necessary -->
+                </nav>
+            </div>
         </div>
     </header>
+
 
     <section>
         <div id="resume-content" class="container">
@@ -34,7 +42,7 @@
 
             <div class="divider"></div>
 
-            <h2>Experience</h2>
+            <!-- <h2>Experience</h2>
             
             <div class="info-item">
                 <h3>Job Position - Company Name</h3>
@@ -42,7 +50,7 @@
                 <p>
                     A description of your role, responsibilities, and achievements at this position.
                 </p>
-            </div>
+            </div> -->
 
             <!-- Repeat the above structure for other experiences -->
 
@@ -51,11 +59,13 @@
             <h2>Education</h2>
 
             <div class="info-item">
-                <h3>Degree - University/Institution Name</h3>
-                <p>Year Started - Year Graduated</p>
-                <p>
+                <h3>B.S. Mathematical Decision Sciences - University of North Carolina at Chapel Hill</h3>
+                <p>2015 - 2019</p>
+                <h3>B.S. Computer Science - University of North Carolina at Chapel Hill</h3>
+                <p>2015 - 2019</p>
+                <!-- <p>
                     A brief description or list of courses relevant to your profession.
-                </p>
+                </p> -->
             </div>
 
             <!-- Repeat the above structure for other educational qualifications -->
@@ -77,4 +87,6 @@
         </div>
     </footer>
 </body>
+<script src="octa_script.js?v=1.2"></script> <!-- Your JavaScript file -->
+
 </html>

@@ -8,7 +8,7 @@ Must be in `lettershape` directory
 `bash build.sh`
 
 ### Windows
-`.\build.bat`
+`build.bat`
 
 ## To view on browser
 

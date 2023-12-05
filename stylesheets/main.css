@@ -5,7 +5,7 @@ body {
     padding: 0;
     background-color: #f3eed0;
     color: #004356;
-    font-family:testing;
+    font-family:Mono;
 
 }
 
@@ -16,7 +16,7 @@ header {
     background-size: 3450px;
     padding: 20px 0;
     text-align: center;
-    font-family:testing;
+    font-family:Mono;
 }
 
 
@@ -26,7 +26,10 @@ section {
 
 h1, h2, h3 {
     margin-top: 0;
+    font-family: Neuesbauen;
 }
+
+
 
 a {
     color: #f77f00;
@@ -75,7 +78,12 @@ footer {
 }
 
 @font-face {
-    font-family: testing;
+    font-family: Mono;
+    src: url(fonts/monofonto.regular.otf) format("opentype");
+  }
+
+  @font-face {
+    font-family: Neuesbauen;
     src: url(fonts/Neuesbauen.ttf);
   }
 

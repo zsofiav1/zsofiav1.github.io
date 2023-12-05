@@ -3,15 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <script src="https://cdn.jsdelivr.net/pyodide/v0.18.1/full/pyodide.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../stylesheets/main.css?v=1.1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Line Drawing Grid</title>
     <style>
+
+        .grid-canvas-container {
+            align-items: center;
+            justify-content: center;
+        }
         .grid-container {
             display: grid;
             gap: 10px;
             justify-content: center;
             align-items: center;
-            position: relative;
+            position: absolute;
             z-index: 1;
         }
         .grid-item {
@@ -29,7 +35,7 @@
             background-color: black;
         }
         canvas {
-            position: absolute;
+            position: relative;
             top: 0;
             left: 0;
             z-index: 0; /* Place canvas behind other elements */
@@ -44,6 +50,24 @@
     
 </head>
 <body>
+    <header>
+        <div class="header_container">
+            <!-- <div id="octahedronCanvas"></div> -->
+            <div class="header_content">
+
+                <h1>Zsofia K. Voros</h1>
+                <p>Professional Data Analyst | Statistician | Data Engineer</p>
+                <nav><b>
+                    <!-- Navigation links -->
+                    <a href="../../../index.html">Home</a>
+                    &nbsp;
+                    <a href="../../projects.html">Projects</a>
+                    &nbsp;
+                    <a href="../../../cv.pdf">Curriculum Vitae</a>
+                </b></nav>
+            </div>
+        </div>
+    </header>
     <div class="controls">
         <label for="width-slider">Grid Width:</label>
         <input type="range" id="width-slider" min="1" max="8" value="3">
@@ -52,14 +76,18 @@
         <button id="reset-button">Reset</button>
     </div>
     
+    <div class="grid-canvas-container">
     <div class="grid-container" id="grid"></div>
-    <canvas id="line-canvas"></canvas>    
+    <canvas id="line-canvas"></canvas> 
+    </div>
+   
+      
     
 
     <p>Clicked Coordinates: <span id="coordinates"></span></p>
-    <button id="run-python">Run Python Code</button>
+    <!-- <button id="run-python">Run Python Code</button> -->
     <pre id="output"></pre>
-    <script type= "module" src="script.js?v=1.1"></script>
+    <script type= "module" src="script.js?v=1.0"></script>
     
 </body>
 </html>

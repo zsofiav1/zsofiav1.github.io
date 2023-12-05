@@ -40,7 +40,7 @@ a:hover {
 .header_content {
     max-width: 800px;
     margin: auto;
-    background-color: rgba(243, 238, 208, 0.8); 
+    background-color: rgba(243, 238, 208, 0.9); 
     padding: 10px; /* Add padding as needed */
     border-radius: 5px;
 }

@@ -108,59 +108,8 @@ document.addEventListener('DOMContentLoaded', () => {
         redrawLines();
     });
 
-    // Adding event listener to the button
-    runPython.addEventListener('click', async () => {
-        let py_output = await runPythonFunction('greet', ['World']);
-        output.textContent = py_output;
-    });
-
 
     // Initialize the grid
     createGrid(widthSlider.value, heightSlider.value);
 });
 
-// pyodide_script.js
-
-// Async function to load Pyodide
-async function loadPyodideAndPackages() {
-    let pyodide = await loadPyodide({
-        indexURL : "https://cdn.jsdelivr.net/pyodide/v0.18.1/full/"
-    });
-    return pyodide;
-}
-
-let pyodideReadyPromise = loadPyodideAndPackages();
-
-// pyodide_script.js
-
-// ... [previous code to load Pyodide]
-
-// Python code as a string (example)
-const myPythonCode = `
-import networkx as nx
-import math
-from itertools import combinations
-from operator import itemgetter
-def greet(name):
-    return f"Hello, {name}!"
-
-def add_numbers(a, b):
-    return a + b
-`;
-
-// Load and run the Python code
-async function loadAndRunPythonCode() {
-    const pyodide = await pyodideReadyPromise;
-    pyodide.runPython(myPythonCode);
-}
-
-// Function to run a specific Python function
-async function runPythonFunction(funcName, args) {
-    const pyodide = await pyodideReadyPromise;
-    await loadAndRunPythonCode(); // Ensure the Python code is loaded
-    return pyodide.runPython(`
-        ${funcName}(${args.map(arg => JSON.stringify(arg)).join(', ')})
-    `);
-}
-
-// ... [event listener code]

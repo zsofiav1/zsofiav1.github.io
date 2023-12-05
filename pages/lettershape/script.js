@@ -328,9 +328,10 @@ function drawPolygon() {
                 input.style.height = `${input_size_px}px`;
                 input.style.fontSize = `${input_size_px * 0.75}px`;
                 input.style.textAlign = 'center';
-                input.style.color = window.getComputedStyle(document.querySelector('h4')).color;
+                input.style.color = window.getComputedStyle(document.querySelector('h1')).color;
                 input.style.fontWeight = 'bold';
-                input.style.fontFamily = window.getComputedStyle(document.querySelector('h4')).fontFamily;
+                // input.style.fontFamily = window.getComputedStyle(document.querySelector('h1')).fontFamily;
+                input.style.fontFamily = "Mono";
                 input.style.backgroundColor = INPUT_VALID_COLOR();
                 inputs.push(input);
                 document.body.appendChild(input);

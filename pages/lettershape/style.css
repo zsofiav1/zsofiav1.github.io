@@ -1,8 +1,8 @@
 :root {
     --background-color: rgb(136, 211, 129);
-    --button-color: rgb(111, 190, 104);
-    --button-hover-color: rgb(75, 128, 70);
-    --text-color: rgb(53, 92, 50);
+    --button-color: #f77f00;;
+    --button-hover-color: #d62828;
+    --text-color: #004356;
 }
 body {
     background-color: var(--background-color);
@@ -13,7 +13,7 @@ h1, h2, p {
     justify-content: center;
     align-items: center;
     text-align: center;
-    font-family: 'Roboto', sans-serif;
+    /* font-family: 'Roboto', sans-serif; */
     /* font-size: 3em; */
     margin: 0;
     padding: 0;
@@ -42,7 +42,7 @@ h1, h2, p {
     margin: auto;
     border-radius: 25px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    font-family: 'Roboto', sans-serif;
+    /* font-family: 'Roboto', sans-serif; */
 }
 .polygon {
     margin: auto;
@@ -68,10 +68,10 @@ h1, h2, p {
 }
 
 .button-container button {
-    color: white;
+    color: #f3eed0;
     background-color: var(--button-color);
-    border: saddlebrown;
-    border-radius: 5px;
+    border: #004356;
+    border-radius: 50px;
     padding: 10px 20px;
     margin: 5px;
     font-size: 16px;
@@ -110,13 +110,13 @@ h1, h2, p {
   /* Styling for Slider Track */
   .slider::-webkit-slider-runnable-track {
     width: 100%;
-    background: linear-gradient(to right, var(--button-color), var(--button-hover-color), var(--text-color)); /* Gradient */
+    background: linear-gradient(to right, var(--button-color), var(--button-hover-color)); /* Gradient */
     border-radius: 5px;
   }
   
   .slider::-moz-range-track {
     width: 100%;
-    background: linear-gradient(to right, var(--button-color), var(--button-hover-color), var(--text-color)); /* Gradient */
+    background: linear-gradient(to right, var(--button-color), var(--button-hover-color)); /* Gradient */
     border-radius: 5px;
   }
   
@@ -126,7 +126,7 @@ h1, h2, p {
     appearance: none;
     width: 25px; /* Width and height of the slider thumb */
     height: 25px;
-    background: rgb(168, 94, 10); /* Slider thumb background color */
+    background: #004356; /* Slider thumb background color */
     cursor: pointer; /* Cursor on hover */
     border-radius: 50%; /* Circular shape */
     /* border: 2px solid rgb(136, 10, 168); */
